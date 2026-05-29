@@ -46,6 +46,19 @@
     backdrop-filter: blur(10px);
   }
   .meta-chip strong { font-weight: 700; }
+  .header-link {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: white;
+    text-decoration: none;
+    margin-top: 12px;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s;
+  }
+  .header-link:hover { background: rgba(255,255,255,0.28); }
 
   /* NAV (sticky) */
   nav.tabs {
@@ -311,6 +324,7 @@
       <div class="meta-chip">⏱️ <strong>ระยะเวลา:</strong> 140 วัน</div>
       <div class="meta-chip">🎯 <strong>SMEs:</strong> 15 กิจการ × 5 manday</div>
     </div>
+    <a href="calendar.html" class="header-link">📅 ดูแบบ Calendar →</a>
   </div>
 </header>
 
