@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline โครงการ DIP × AOO 2569</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Sarabun', -apple-system, sans-serif;
+    background: #f5f6fa;
+    color: #1a1a2e;
+    line-height: 1.6;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER (compact) */
+  .header {
+    background: linear-gradient(135deg, #1a1a4e 0%, #5a2d82 100%);
+    color: white;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,77,141,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header-inner { max-width: 1200px; margin: 0 auto; position: relative; }
+  .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .header .subtitle { font-size: 13px; opacity: 0.85; margin-bottom: 16px; }
+  .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .meta-chip {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    backdrop-filter: blur(10px);
+  }
+  .meta-chip strong { font-weight: 700; }
+
+  /* NAV (sticky) */
+  nav.tabs {
+    background: white;
+    border-bottom: 1px solid #e0e3eb;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .tabs-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-inner::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1 1 auto;
+    min-width: 130px;
+    background: none;
+    border: none;
+    padding: 16px 20px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #777;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .tab-btn:hover { color: #5a2d82; background: #faf8ff; }
+  .tab-btn.active {
+    color: #5a2d82;
+    border-bottom-color: #8e24aa;
+    background: linear-gradient(180deg, transparent 70%, rgba(142,36,170,0.06));
+  }
+  .tab-btn .tab-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #e0e3eb;
+    color: #777;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .tab-btn.active .tab-num { background: #8e24aa; color: white; }
+
+  /* MAIN */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .panel-title .num {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+  .num-0 { background: linear-gradient(135deg, #607d8b, #455a64); }
+  .num-1 { background: linear-gradient(135deg, #1e88e5, #1565c0); }
+  .num-2 { background: linear-gradient(135deg, #8e24aa, #5a2d82); }
+  .num-3 { background: linear-gradient(135deg, #43a047, #2e7d32); }
+  .panel-title h2 { font-size: 22px; font-weight: 700; }
+  .panel-title .range { font-size: 13px; color: #777; margin-top: 2px; }
+
+  /* CARD */
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #5a2d82; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #f0f1f5; vertical-align: top; }
+  th { background: #fafbfd; font-weight: 700; color: #5a2d82; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+  td.date { font-weight: 600; white-space: nowrap; min-width: 120px; }
+  tr.highlight { background: linear-gradient(90deg, #fff3cd 0%, #fffbeb 100%); }
+  tr.deadline-row td { background: linear-gradient(90deg, #ffe5ec 0%, #fff5f7 100%); font-weight: 600; }
+  tr.deadline-row td.date { color: #e63946; }
+
+  /* OVERVIEW PHASE CARDS */
+  .phase-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .phase-preview {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-top: 4px solid;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .phase-preview:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+  .phase-preview.p1 { border-top-color: #1e88e5; }
+  .phase-preview.p2 { border-top-color: #8e24aa; }
+  .phase-preview.p3 { border-top-color: #43a047; }
+  .phase-preview .num-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
+  .phase-preview h3 { font-size: 17px; margin: 6px 0 4px; color: #1a1a2e; }
+  .phase-preview .range { font-size: 12px; color: #888; margin-bottom: 12px; }
+  .phase-preview ul { list-style: none; font-size: 13px; color: #555; }
+  .phase-preview li { padding: 3px 0; }
+  .phase-preview li::before { content: '• '; color: #aaa; }
+
+  /* SME BOX */
+  .sme-box {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left: 4px solid #f59e0b;
+    padding: 20px 24px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+  }
+  .sme-box h3 { font-size: 16px; color: #92400e; margin-bottom: 6px; }
+  .sme-box .desc { font-size: 12px; color: #92400e; margin-bottom: 14px; }
+  .sme-box .inner-block {
+    background: rgba(255,255,255,0.6);
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .sme-box .inner-block-title { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+  .sme-box ul { list-style: none; font-size: 14px; }
+  .sme-box li { padding: 4px 0; }
+  .sme-box li::before { content: '📌 '; }
+
+  /* GROUP CARDS */
+  .group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .group-card {
+    border-radius: 12px;
+    padding: 18px;
+    color: white;
+  }
+  .group-1 { background: linear-gradient(135deg, #1e88e5, #1565c0); }
+  .group-2 { background: linear-gradient(135deg, #ec407a, #c2185b); }
+  .group-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: white; }
+  .group-card .meta { font-size: 13px; opacity: 0.9; margin-bottom: 12px; }
+  .group-card ul { list-style: none; }
+  .group-card li {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+  .group-card li.done { background: rgba(255,255,255,0.28); font-weight: 700; }
+
+  /* OPEN WINDOW */
+  .open-window {
+    background: linear-gradient(135deg, #e8f5e9 0%, #d0eed3 100%);
+    border-left: 4px solid #43a047;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-top: 14px;
+  }
+  .open-window h4 { font-size: 14px; color: #2e7d32; margin-bottom: 6px; }
+  .open-window p { font-size: 13px; color: #2e4d2f; }
+
+  /* INTERVIEW SLOTS */
+  .interview-slots {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-left: 4px solid #1976d2;
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-top: 16px;
+  }
+  .interview-slots h4 { font-size: 15px; color: #0d47a1; margin-bottom: 6px; font-weight: 700; }
+  .interview-slots .note { font-size: 12px; color: #1565c0; margin-bottom: 12px; }
+  .slot-table {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  .slot-table th { background: #1976d2; color: white; font-weight: 600; text-align: center; }
+  .slot-table td { padding: 7px 10px; border-bottom: 1px solid #e3f2fd; text-align: center; }
+  .slot-table td.slot-num { background: #f5f9ff; font-weight: 700; color: #0d47a1; width: 50px; }
+  .slot-table td.slot-time { font-weight: 600; white-space: nowrap; }
+  .slot-table tr.break td { background: #fff8e1; color: #f57c00; font-style: italic; font-weight: 600; }
+  .slot-table tr.lunch td { background: #ffe0b2; color: #d84315; font-weight: 700; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    padding: 24px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .header { padding: 20px 16px; }
+    .header h1 { font-size: 19px; }
+    main { padding: 16px; }
+    .card { padding: 16px; }
+    .tab-btn { padding: 14px 14px; min-width: auto; font-size: 13px; }
+    th, td { padding: 8px; font-size: 13px; }
+    td.date { min-width: 90px; }
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: white; }
+    nav.tabs { display: none; }
+    .panel { display: block !important; page-break-before: always; }
+    .panel:first-of-type { page-break-before: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <h1>Timeline โครงการ DIP × AOO 2569</h1>
+    <div class="subtitle">กิจกรรมการเพิ่มประสิทธิภาพเว็บไซต์และระบบจัดการด้วยเทคโนโลยีดิจิทัล และปัญญาประดิษฐ์</div>
+    <div class="meta-chips">
+      <div class="meta-chip">📍 <strong>ผู้ว่าจ้าง:</strong> DIP — กรมส่งเสริมฯ</div>
+      <div class="meta-chip">🏢 <strong>ผู้รับจ้าง:</strong> AOO Commerce</div>
+      <div class="meta-chip">📅 <strong>ลงนาม:</strong> 11 พ.ค. 2569</div>
+      <div class="meta-chip">⏱️ <strong>ระยะเวลา:</strong> 140 วัน</div>
+      <div class="meta-chip">🎯 <strong>SMEs:</strong> 15 กิจการ × 5 manday</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab-btn active" data-panel="overview"><span class="tab-num">★</span>ภาพรวม</button>
+    <button class="tab-btn" data-panel="phase1"><span class="tab-num">1</span>Phase 1 — รับสมัคร</button>
+    <button class="tab-btn" data-panel="phase2"><span class="tab-num">2</span>Phase 2 — พัฒนา</button>
+    <button class="tab-btn" data-panel="phase3"><span class="tab-num">3</span>Phase 3 — ปิดงาน</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section class="panel active" id="overview">
+    <div class="panel-title">
+      <div class="num num-0">★</div>
+      <div>
+        <h2>ภาพรวมโครงการ</h2>
+        <div class="range">11 พ.ค. – 28 ก.ย. 2569 · 140 วัน</div>
+      </div>
+    </div>
+
+    <div class="phase-cards">
+      <div class="phase-preview p1" data-go="phase1">
+        <div class="num-label">Phase 1 · 30 วัน</div>
+        <h3>เตรียมงาน + คัดเลือก SMEs</h3>
+        <div class="range">11 พ.ค. – 9 มิ.ย. 2569</div>
+        <ul>
+          <li>เปิดรับสมัคร 14–31 พ.ค.</li>
+          <li>Pre-screen 200 → 30</li>
+          <li>สัมภาษณ์ 4–5 มิ.ย.</li>
+          <li>ประกาศผล 15 กิจการ 8 มิ.ย.</li>
+        </ul>
+      </div>
+      <div class="phase-preview p2" data-go="phase2">
+        <div class="num-label">Phase 2 · 47 วัน</div>
+        <h3>พิธีเปิด + Manday 1–5</h3>
+        <div class="range">11 มิ.ย. – 27 ก.ค. 2569</div>
+        <ul>
+          <li>เปิดตัว 11 มิ.ย. (Zoom 2 ชม.)</li>
+          <li>Personal Consult 12–22 มิ.ย.</li>
+          <li>กลุ่ม 1 (พุธ) จบ 15 ก.ค.</li>
+          <li>กลุ่ม 2 (จันทร์) จบ 27 ก.ค.</li>
+        </ul>
+      </div>
+      <div class="phase-preview p3" data-go="phase3">
+        <div class="num-label">Phase 3 · 35 วัน</div>
+        <h3>รายงาน + Success Case</h3>
+        <div class="range">28 ก.ค. – 31 ส.ค. 2569</div>
+        <ul>
+          <li>Progress Report 1 สัปดาห์</li>
+          <li>🟢 พร้อมส่งงวด 2: 6 ส.ค.</li>
+          <li>Success Case + Final 12–28 ส.ค.</li>
+          <li>🟢 พร้อมส่งงวด 3: 31 ส.ค.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SME MANDATORY DATES -->
+    <div class="sme-box">
+      <h3>วันที่ผู้ประกอบการ (SMEs) จำเป็นต้องเข้า</h3>
+      <p class="desc">ใช้ checklist นี้ตอนสัมภาษณ์ 4–5 มิ.ย. เพื่อยืนยันความพร้อมก่อนรับเข้าโครงการ</p>
+
+      <div class="inner-block">
+        <div class="inner-block-title">📌 ทุกกิจการต้องเข้าครบ</div>
+        <ul>
+          <li><strong>11 มิ.ย. 09:00</strong> เปิดตัวโครงการ (Zoom — 2 ชั่วโมง) โดย ผอ. กรมส่งเสริมฯ</li>
+          <li><strong>12–22 มิ.ย.</strong> Personal Consult on-site (1 วันเต็ม — เลือก 1 วันที่สะดวก) <em style="color:#92400e;">→ วันนี้ลง i-industry พร้อมกัน</em></li>
+          <li><strong>ก่อน 23 มิ.ย.</strong> ลงทะเบียน i-industry</li>
+          <li><strong>กลาง ก.ย.</strong> ถ่ายทำ Success Case (เฉพาะกิจการที่ถูกเลือก ≥2 ราย)</li>
+        </ul>
+      </div>
+
+      <div class="inner-block-title">💬 ตอนสัมภาษณ์: ถามให้เลือก — "สะดวกกลุ่ม 1 หรือกลุ่ม 2?"</div>
+      <div class="group-grid">
+        <div class="group-card group-1">
+          <h3>กลุ่มที่ 1 — ทุกวันพุธ</h3>
+          <div class="meta">รับ 7 กิจการ · 4 พุธติดกัน · เริ่มก่อน</div>
+          <ul>
+            <li><span>Session 1</span><span>พ. 24 มิ.ย.</span></li>
+            <li><span>Session 2</span><span>พ. 1 ก.ค.</span></li>
+            <li><span>Session 3</span><span>พ. 8 ก.ค.</span></li>
+            <li class="done"><span>Session 4 ✅</span><span>พ. 15 ก.ค.</span></li>
+          </ul>
+        </div>
+        <div class="group-card group-2">
+          <h3>กลุ่มที่ 2 — ทุกวันจันทร์</h3>
+          <div class="meta">รับ 8 กิจการ · เริ่มช้ากว่า 1 สัปดาห์</div>
+          <ul>
+            <li><span>Session 1</span><span>จ. 6 ก.ค.</span></li>
+            <li><span>Session 2</span><span>จ. 13 ก.ค.</span></li>
+            <li><span>Session 3</span><span>จ. 20 ก.ค.</span></li>
+            <li class="done"><span>Session 4 ✅</span><span>จ. 27 ก.ค.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PHASE 1 ============ -->
+  <section class="panel" id="phase1">
+    <div class="panel-title">
+      <div class="num num-1">1</div>
+      <div>
+        <h2>เตรียมงาน + คัดเลือก SMEs</h2>
+        <div class="range">11 พ.ค. – 9 มิ.ย. 2569 · 30 วัน</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 ลำดับงาน Phase 1</h3>
+      <table>
+        <thead>
+          <tr><th>วันที่</th><th>กิจกรรม</th><th>ผลผลิต</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="date">11 พ.ค. (จ.)</td><td>ลงนามสัญญา</td><td>สัญญาเริ่มต้น</td></tr>
+          <tr><td class="date">11–13 พ.ค.</td><td>จัดตั้งทีม + เกณฑ์คัดเลือก + สื่อโปรโมท</td><td>ทีม + เกณฑ์ + แบนเนอร์</td></tr>
+          <tr class="highlight"><td class="date">14 พ.ค. (พฤ.)</td><td><strong>โพสรับสมัคร + เริ่ม FB Ads</strong></td><td>โพสเปิดรับสมัคร</td></tr>
+          <tr><td class="date">14–31 พ.ค.</td><td>เปิดรับสมัคร 18 วัน (เป้า ≥200 ราย)</td><td>รายชื่อผู้สมัคร</td></tr>
+          <tr><td class="date">28–31 พ.ค.</td><td>จัดทำ Criteria Matrix + แบบประเมิน + ขอ DIP เห็นชอบ</td><td>Matrix + Rubric</td></tr>
+          <tr class="highlight"><td class="date">31 พ.ค. (อา.)</td><td><strong>ปิดรับสมัคร</strong></td><td>List ครบ</td></tr>
+          <tr><td class="date">1 มิ.ย. (จ.)</td><td><strong>Pre-screen 200 → 30</strong> (โทร/ไลน์ เช็คความพร้อม)</td><td>Shortlist 30 ราย</td></tr>
+          <tr class="highlight"><td class="date">2 มิ.ย. (อ.) บ่าย</td><td><strong>📢 โพสประกาศ 30 กิจการ + ส่งคิวสัมภาษณ์</strong></td><td>โพส live + ตารางคิว</td></tr>
+          <tr><td class="date">3 มิ.ย. (พ.)</td><td>ยืนยันคิว + ส่งคำถาม Pre-interview</td><td>ยืนยันครบ</td></tr>
+          <tr class="highlight"><td class="date">4–5 มิ.ย. (พฤ.-ศ.)</td><td><strong>สัมภาษณ์ Online 15 นาที × 15 ราย/วัน</strong></td><td>คะแนน 30 กิจการ</td></tr>
+          <tr><td class="date">6–7 มิ.ย. (ส.-อา.)</td><td>ประมวลคะแนน + จัดอันดับ + เสนอ DIP เห็นชอบ + แบ่งกลุ่ม</td><td>รายชื่อ 15 + แบ่งกลุ่ม</td></tr>
+          <tr class="highlight"><td class="date">8 มิ.ย. (จ.)</td><td><strong>📣 ประกาศผล 15 กิจการ + แจ้งกลุ่ม</strong></td><td>ประกาศ + ตารางกลุ่ม</td></tr>
+          <tr><td class="date">9–10 มิ.ย.</td><td>เตรียม Inception Report + เตรียม Zoom พิธีเปิด</td><td>เอกสารพร้อม</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- INTERVIEW SLOTS -->
+    <div class="interview-slots">
+      <h4>📞 ตารางคิวสัมภาษณ์ Online — 4–5 มิ.ย. 2569</h4>
+      <div class="note">15 นาที/กิจการ · 15 ราย/วัน · 09:00–14:00 · พักช่วงเช้า 15 นาที + พักเที่ยง 60 นาที</div>
+      <table class="slot-table">
+        <thead>
+          <tr>
+            <th>Slot</th>
+            <th>เวลา</th>
+            <th>วัน 1 — 4 มิ.ย. (พฤ.)</th>
+            <th>วัน 2 — 5 มิ.ย. (ศ.)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="slot-num">1</td><td class="slot-time">09:00–09:15</td><td>บ.#1</td><td>บ.#16</td></tr>
+          <tr><td class="slot-num">2</td><td class="slot-time">09:15–09:30</td><td>บ.#2</td><td>บ.#17</td></tr>
+          <tr><td class="slot-num">3</td><td class="slot-time">09:30–09:45</td><td>บ.#3</td><td>บ.#18</td></tr>
+          <tr><td class="slot-num">4</td><td class="slot-time">09:45–10:00</td><td>บ.#4</td><td>บ.#19</td></tr>
+          <tr><td class="slot-num">5</td><td class="slot-time">10:00–10:15</td><td>บ.#5</td><td>บ.#20</td></tr>
+          <tr class="break"><td colspan="4">☕ พักช่วงเช้า 15 นาที (10:15–10:30)</td></tr>
+          <tr><td class="slot-num">6</td><td class="slot-time">10:30–10:45</td><td>บ.#6</td><td>บ.#21</td></tr>
+          <tr><td class="slot-num">7</td><td class="slot-time">10:45–11:00</td><td>บ.#7</td><td>บ.#22</td></tr>
+          <tr><td class="slot-num">8</td><td class="slot-time">11:00–11:15</td><td>บ.#8</td><td>บ.#23</td></tr>
+          <tr><td class="slot-num">9</td><td class="slot-time">11:15–11:30</td><td>บ.#9</td><td>บ.#24</td></tr>
+          <tr><td class="slot-num">10</td><td class="slot-time">11:30–11:45</td><td>บ.#10</td><td>บ.#25</td></tr>
+          <tr class="lunch"><td colspan="4">🍱 พักกลางวัน 60 นาที (11:45–12:45)</td></tr>
+          <tr><td class="slot-num">11</td><td class="slot-time">12:45–13:00</td><td>บ.#11</td><td>บ.#26</td></tr>
+          <tr><td class="slot-num">12</td><td class="slot-time">13:00–13:15</td><td>บ.#12</td><td>บ.#27</td></tr>
+          <tr><td class="slot-num">13</td><td class="slot-time">13:15–13:30</td><td>บ.#13</td><td>บ.#28</td></tr>
+          <tr><td class="slot-num">14</td><td class="slot-time">13:30–13:45</td><td>บ.#14</td><td>บ.#29</td></tr>
+          <tr><td class="slot-num">15</td><td class="slot-time">13:45–14:00</td><td>บ.#15</td><td>บ.#30</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ PHASE 2 ============ -->
+  <section class="panel" id="phase2">
+    <div class="panel-title">
+      <div class="num num-2">2</div>
+      <div>
+        <h2>พิธีเปิด + Manday 1–5</h2>
+        <div class="range">11 มิ.ย. – 27 ก.ค. 2569 · 47 วัน</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 ลำดับงาน Phase 2</h3>
+      <table>
+        <thead>
+          <tr><th>วันที่</th><th>กิจกรรม</th><th>ผลผลิต</th></tr>
+        </thead>
+        <tbody>
+          <tr class="highlight"><td class="date">11 มิ.ย. (พฤ.) 09:00</td><td><strong>🎀 เปิดตัวโครงการ (Zoom 2 ชม.) — ผอ. กรมส่งเสริมฯ</strong></td><td>SMEs onboarded</td></tr>
+          <tr class="highlight"><td class="date">12–22 มิ.ย.</td><td><strong>🚗 Manday 1 — Personal Consult on-site</strong> (3 ผู้เชี่ยวชาญ × 5 กิจการ — 1 วัน/กิจการ) <em>+ พา SME ลง i-industry ในวันเดียวกัน</em></td><td>ผลวินิจฉัย + รูป/VDO + i-industry ลงครบ</td></tr>
+          <tr class="highlight"><td class="date">22 มิ.ย. (จ.)</td><td><strong>Personal Consult ครบ 15 กิจการ + i-industry ลงครบ</strong></td><td>SMEs ลงทะเบียนครบ 1 วันก่อน deadline</td></tr>
+          <tr><td class="date">23–24 มิ.ย.</td><td>Finalize Inception Report 2 เล่ม</td><td>Inception Report</td></tr>
+          <tr><td class="date">24 มิ.ย. (พ.)</td><td>กลุ่ม 1 — Manday 2 / Session 1 (เริ่มก่อน)</td><td>เริ่ม Group Training</td></tr>
+          <tr class="deadline-row"><td class="date">🔴 25 มิ.ย. (พฤ.)</td><td><strong>Deadline งวด 1 (Day 45)</strong> — ส่ง Inception Report</td><td>งวด 1 ส่ง (25%)</td></tr>
+          <tr><td class="date">1 ก.ค. (พ.)</td><td>กลุ่ม 1 — Manday 3 / Session 2</td><td></td></tr>
+          <tr><td class="date">6 ก.ค. (จ.)</td><td>กลุ่ม 2 — Manday 2 / Session 1</td><td>เริ่ม Group 2</td></tr>
+          <tr><td class="date">8 ก.ค. (พ.)</td><td>กลุ่ม 1 — Manday 4 / Session 3</td><td></td></tr>
+          <tr><td class="date">13 ก.ค. (จ.)</td><td>กลุ่ม 2 — Manday 3 / Session 2</td><td></td></tr>
+          <tr class="highlight"><td class="date">15 ก.ค. (พ.)</td><td><strong>กลุ่ม 1 — Manday 5 / Session 4 — จบ ✅</strong></td><td>กลุ่ม 1 ครบ 5 manday</td></tr>
+          <tr><td class="date">20 ก.ค. (จ.)</td><td>กลุ่ม 2 — Manday 4 / Session 3</td><td></td></tr>
+          <tr class="highlight"><td class="date">27 ก.ค. (จ.)</td><td><strong>กลุ่ม 2 — Manday 5 / Session 4 — จบ ✅</strong></td><td>ทั้ง 15 กิจการครบ 5 manday</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- GROUP GRID -->
+    <div class="card">
+      <h3>👥 ตารางอบรมกลุ่ม</h3>
+      <div class="group-grid">
+        <div class="group-card group-1">
+          <h3>กลุ่มที่ 1 — ทุกวันพุธ × 4</h3>
+          <div class="meta">7 กิจการ · 4 พุธติดกัน · เริ่มก่อน · จบก่อน</div>
+          <ul>
+            <li><span>Manday 2 / Session 1</span><span>24 มิ.ย.</span></li>
+            <li><span>Manday 3 / Session 2</span><span>1 ก.ค.</span></li>
+            <li><span>Manday 4 / Session 3</span><span>8 ก.ค.</span></li>
+            <li class="done"><span>Manday 5 / Session 4 ✅</span><span>15 ก.ค.</span></li>
+          </ul>
+        </div>
+        <div class="group-card group-2">
+          <h3>กลุ่มที่ 2 — ทุกวันจันทร์ × 4</h3>
+          <div class="meta">8 กิจการ · เริ่มช้ากว่า 1 สัปดาห์</div>
+          <ul>
+            <li><span>Manday 2 / Session 1</span><span>6 ก.ค.</span></li>
+            <li><span>Manday 3 / Session 2</span><span>13 ก.ค.</span></li>
+            <li><span>Manday 4 / Session 3</span><span>20 ก.ค.</span></li>
+            <li class="done"><span>Manday 5 / Session 4 ✅</span><span>27 ก.ค.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="open-window">
+        <h4>🪟 ช่วงเปิดให้ visit เพิ่ม (Make-up / ถ่าย VDO เสริม)</h4>
+        <p><strong>ระหว่าง Group Sessions (24 มิ.ย. – 27 ก.ค.):</strong> อังคาร · พฤหัส · ศุกร์ — Wed = กลุ่ม 1, Mon = กลุ่ม 2</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PHASE 3 ============ -->
+  <section class="panel" id="phase3">
+    <div class="panel-title">
+      <div class="num num-3">3</div>
+      <div>
+        <h2>รายงาน + Success Case + ปิดสัญญา</h2>
+        <div class="range">28 ก.ค. – 31 ส.ค. 2569 · งานจริง 35 วัน (deadline 28 ก.ย.)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 ลำดับงาน Phase 3</h3>
+      <table>
+        <thead>
+          <tr><th>วันที่</th><th>กิจกรรม</th><th>ผลผลิต</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="date">28 ก.ค. – 3 ส.ค.</td><td>Progress Report + รายงานรายกิจการ × 15 <em>(1 สัปดาห์)</em></td><td>Draft Progress Report</td></tr>
+          <tr><td class="date">4–5 ส.ค.</td><td>QA + finalize Progress Report</td><td>Progress Report พร้อมส่ง</td></tr>
+          <tr class="highlight"><td class="date">🟢 6 ส.ค. (พฤ.)</td><td><strong>พร้อมส่งงวด 2</strong> — ก่อน TOR deadline 23 วัน</td><td>งวด 2 ส่ง</td></tr>
+          <tr><td class="date">10–11 ส.ค.</td><td>คัดเลือก Success Case ≥2 กิจการ + นัดถ่ายทำ <em>(2 วัน)</em></td><td>กิจการ Success Case + ตารางถ่ายทำ</td></tr>
+          <tr><td class="date">12–18 ส.ค.</td><td>ถ่ายทำ + ตัดต่อวิดีโอ Success Case ≥3 นาที <em>(1 สัปดาห์ — 12 ส.ค. = วันแม่)</em></td><td>VDO Success Case</td></tr>
+          <tr><td class="date">19–25 ส.ค.</td><td>Final Report + คู่มือรายกิจการ × 15 <em>(1 สัปดาห์)</em></td><td>Final Report + คู่มือครบ</td></tr>
+          <tr><td class="date">26–27 ส.ค.</td><td>External HDD + พิมพ์สี + QA ภายใน</td><td>เอกสารพร้อมส่ง</td></tr>
+          <tr><td class="date">28 ส.ค. (ศ.)</td><td>ซ้อมนำเสนอ <em>(1 วัน)</em></td><td>พร้อมนำเสนอ</td></tr>
+          <tr class="deadline-row"><td class="date">🔴 29 ส.ค. (ส.)</td><td><strong>Deadline งวด 2 (Day 110)</strong> — ตาม TOR</td><td>—</td></tr>
+          <tr class="highlight"><td class="date">🟢 31 ส.ค. (จ.)</td><td><strong>พร้อมส่งงวด 3</strong> — ก่อน TOR deadline 28 วัน</td><td>งวด 3 ส่ง + นำเสนอ + ปิดสัญญา ✅</td></tr>
+          <tr class="deadline-row"><td class="date">🔴 28 ก.ย. (จ.)</td><td><strong>Deadline งวด 3 (Day 140)</strong> — ตาม TOR</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">
+  Timeline โครงการ DIP × AOO 2569 · อัปเดต 29 พ.ค. 2569 · ปรับเปลี่ยนได้ตามความเห็นชอบของคณะกรรมการตรวจรับพัสดุ
+</div>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+
+  function activate(target) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.panel === target));
+    panels.forEach(p => p.classList.toggle('active', p.id === target));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Update URL hash for sharing
+    if (history.replaceState) {
+      history.replaceState(null, '', '#' + target);
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activate(tab.dataset.panel));
+  });
+
+  // Phase preview cards
+  document.querySelectorAll('[data-go]').forEach(card => {
+    card.addEventListener('click', () => activate(card.dataset.go));
+  });
+
+  // Restore from URL hash
+  if (window.location.hash) {
+    const hash = window.location.hash.substring(1);
+    if (document.getElementById(hash)) activate(hash);
+  }
+</script>
+
+</body>
+</html>
