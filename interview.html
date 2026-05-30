@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Matrix — DIP × AOO 2569</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'IBM Plex Sans Thai', -apple-system, sans-serif;
+    background: #f5f6fa;
+    color: #1a1a2e;
+    line-height: 1.6;
+  }
+
+  /* LAYOUT */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #1a1a4e 0%, #5a2d82 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-brand {
+    padding: 22px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .sidebar-brand h2 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .sidebar-brand .tag { font-size: 11px; opacity: 0.7; }
+  .sidebar-nav { flex: 1; padding: 10px 0; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 20px;
+    color: rgba(255,255,255,0.78);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+  .nav-item.active {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border-left-color: #ff4d8d;
+    font-weight: 600;
+  }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-footer {
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 11px;
+    opacity: 0.6;
+  }
+
+  /* CONTENT */
+  .content { flex: 1; min-width: 0; }
+  .page-header {
+    background: white;
+    border-bottom: 1px solid #e0e3eb;
+    padding: 22px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #1a1a4e; margin-bottom: 4px; }
+  .page-header .subtitle { font-size: 13px; color: #666; }
+  .page-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .meta-chip {
+    background: #f0e7f7;
+    color: #5a2d82;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  main { padding: 24px 32px 40px; max-width: 1100px; }
+
+  /* SECTION */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a4e;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e0e3eb;
+  }
+  .section-title .num {
+    background: #5a2d82;
+    color: white;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a4e;
+    margin-bottom: 10px;
+  }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eef0f5;
+    vertical-align: top;
+  }
+  th {
+    background: #1a1a4e;
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafbfc; }
+
+  .gate-table th, .gate-table td { text-align: left; }
+  .gate-table td:last-child { text-align: center; font-weight: 600; color: #43a047; }
+
+  /* SCORE BLOCK */
+  .score-block {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    border-left: 4px solid #5a2d82;
+  }
+  .score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .score-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a4e;
+  }
+  .weight-pill {
+    background: #5a2d82;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .score-block .measure {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    background: #f8f9fc;
+    border-radius: 6px;
+  }
+  .score-block .q-main {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a4e;
+    margin: 8px 0 4px;
+  }
+  .score-block .q-followup {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .rubric-table { margin-top: 10px; font-size: 12px; }
+  .rubric-table th { font-size: 11px; padding: 8px 10px; }
+  .rubric-table td { padding: 8px 10px; }
+  .rubric-table .score-cell {
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    width: 50px;
+  }
+  .s5 { color: #2e7d32; }
+  .s4 { color: #558b2f; }
+  .s3 { color: #f9a825; }
+  .s2 { color: #ef6c00; }
+  .s1 { color: #c62828; }
+  .red-flag {
+    background: #ffebee;
+    border-left: 3px solid #d32f2f;
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #c62828;
+    border-radius: 0 6px 6px 0;
+  }
+  .red-flag strong { font-weight: 700; }
+
+  /* CALLOUT */
+  .callout {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .callout-warning { background: #fff8e1; border-left: 4px solid #f59e0b; color: #6b4400; }
+  .callout-danger { background: #ffebee; border-left: 4px solid #d32f2f; color: #b71c1c; }
+  .callout-info { background: #e3f2fd; border-left: 4px solid #1976d2; color: #0d47a1; }
+  .callout strong { font-weight: 700; }
+
+  /* SUMMARY */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .summary-card {
+    background: white;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e0e3eb;
+  }
+  .summary-card .big {
+    font-size: 22px;
+    font-weight: 700;
+    color: #5a2d82;
+    margin-bottom: 2px;
+  }
+  .summary-card .label { font-size: 11px; color: #777; }
+
+  /* FORM PREVIEW */
+  .form-preview {
+    background: #1a1a2e;
+    color: #e8eaf6;
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* DECISION LIST */
+  .decision-list { counter-reset: step; list-style: none; padding: 0; }
+  .decision-list li {
+    counter-increment: step;
+    padding: 10px 10px 10px 44px;
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .decision-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    background: #5a2d82;
+    color: white;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* MOBILE */
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .sidebar-nav {
+      display: flex;
+      overflow-x: auto;
+      padding: 8px;
+    }
+    .nav-item {
+      border-left: none;
+      border-bottom: 3px solid transparent;
+      padding: 10px 16px;
+      white-space: nowrap;
+    }
+    .nav-item.active { border-left: none; border-bottom-color: #ff4d8d; }
+    .sidebar-footer { display: none; }
+    .page-header { padding: 16px 18px; }
+    .page-header h1 { font-size: 18px; }
+    main { padding: 16px 18px 30px; }
+    th, td { padding: 8px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>DIP × AOO 2569</h2>
+      <div class="tag">กิจกรรมเพิ่มประสิทธิภาพเว็บไซต์ฯ</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="timeline.html" class="nav-item"><span class="nav-icon">📋</span>Timeline</a>
+      <a href="calendar.html" class="nav-item"><span class="nav-icon">📅</span>Calendar</a>
+      <a href="interview.html" class="nav-item active"><span class="nav-icon">🎤</span>Interview Matrix</a>
+    </nav>
+    <div class="sidebar-footer">
+      อัปเดต 29 พ.ค. 2569
+    </div>
+  </aside>
+
+  <!-- ============ CONTENT ============ -->
+  <div class="content">
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <h1>🎤 Interview Criteria Matrix + Rubric</h1>
+      <div class="subtitle">คู่มือสัมภาษณ์สำหรับกรรมการ (รอบ 3 — Zoom 15 นาที) — 30 → 15 กิจการ</div>
+      <div class="page-meta">
+        <span class="meta-chip">📅 4–5 มิ.ย. 2569</span>
+        <span class="meta-chip">⏱️ 15 นาที/กิจการ</span>
+        <span class="meta-chip">👥 3 ผู้เชี่ยวชาญ AOO + เจ้าหน้าที่ DIP</span>
+        <span class="meta-chip">💻 ผ่าน Zoom</span>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- OVERVIEW -->
+      <section class="section">
+        <div class="section-title"><span class="num">★</span>ภาพรวมกระบวนการ 3 รอบ</div>
+        <table>
+          <thead>
+            <tr><th>รอบ</th><th>ช่วง</th><th>จำนวน</th><th>วิธีการ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>รอบ 1 — สมัคร</td><td>14–31 พ.ค.</td><td>~200 ราย</td><td>Google Form + FB Ads</td></tr>
+            <tr><td>รอบ 2 — Pre-screen</td><td>1 มิ.ย.</td><td>200 → 30</td><td>โทร/ไลน์ เช็คคุณสมบัติเบื้องต้น + ความพร้อม</td></tr>
+            <tr style="background:#f0e7f7;"><td><strong>รอบ 3 — สัมภาษณ์ Online</strong></td><td><strong>4–5 มิ.ย.</strong></td><td><strong>30 → 15</strong></td><td><strong>Zoom 15 นาที + Matrix นี้</strong></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- WEIGHT SUMMARY -->
+      <section class="section">
+        <div class="section-title"><span class="num">%</span>น้ำหนักคะแนน (รวม 100%)</div>
+        <div class="summary-row">
+          <div class="summary-card"><div class="big">30%</div><div class="label">🚪 Gate (Binary)</div></div>
+          <div class="summary-card"><div class="big">20%</div><div class="label">2 ความจำเป็น</div></div>
+          <div class="summary-card"><div class="big">15%</div><div class="label">3 สินค้าชัด</div></div>
+          <div class="summary-card"><div class="big">12%</div><div class="label">4 ประสบการณ์</div></div>
+          <div class="summary-card"><div class="big">10%</div><div class="label">5 ตั้งใจ</div></div>
+          <div class="summary-card"><div class="big">8%</div><div class="label">6 ช่องทางเดิม</div></div>
+          <div class="summary-card"><div class="big">5%</div><div class="label">7 ทักษะ digital</div></div>
+        </div>
+      </section>
+
+      <!-- GATE -->
+      <section class="section">
+        <div class="section-title"><span class="num">1</span>🚪 Gate Criterion (Binary, 30%)</div>
+        <div class="callout callout-danger">
+          <strong>สำคัญ:</strong> ข้อนี้คือ <strong>ตัวตัดสินแรก</strong> — ถ้าผู้สมัครไม่สะดวกเข้าครบ <strong>ปฏิเสธทันที</strong> ไม่ต้องประเมินข้ออื่นต่อ
+        </div>
+
+        <div class="card">
+          <div class="card-title">หัวข้อ: พร้อมเข้าครบทุกวัน</div>
+          <table class="gate-table">
+            <thead>
+              <tr><th>#</th><th>คำถาม</th><th>ต้องตอบ</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1a</td><td>พิธีเปิด <strong>11 มิ.ย. 2569 (พฤ.) 09:00</strong> ผ่าน Zoom เข้าได้มั้ย?</td><td>ใช่</td></tr>
+              <tr><td>1b</td><td>Group Sessions × 4 ครั้ง ในช่วง <strong>มิ.ย.–ก.ย.</strong> (วันจะแจ้งภายในต้น มิ.ย.) เข้าได้มั้ย?</td><td>ใช่</td></tr>
+              <tr><td>1c</td><td>On-site Visit × 5 ครั้ง (~6 ชม./ครั้ง รวม ≥30 ชม.) ในช่วง <strong>มิ.ย.–ก.ย.</strong> รับได้มั้ย?</td><td>ใช่</td></tr>
+              <tr><td>1d</td><td>ลงทะเบียน i-industry ภายใน <strong>23 มิ.ย.</strong> ทำได้มั้ย?</td><td>ใช่</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Scoring Rule</div>
+          <table>
+            <thead>
+              <tr><th>สถานการณ์</th><th>คะแนน</th><th>การดำเนินการ</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>ตอบ <strong>"ใช่" ครบ 4 ข้อ</strong></td><td><strong style="color:#2e7d32;">5 (เต็ม 30%)</strong></td><td>✅ ดำเนินการสัมภาษณ์ต่อ</td></tr>
+              <tr><td>ตอบ "ไม่ใช่" / "ลองดู" / "ไม่แน่ใจ" ข้อใดข้อหนึ่ง</td><td><strong style="color:#c62828;">0</strong></td><td>🚪 หยุดสัมภาษณ์ → reject</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info">
+          <strong>Script ปฏิเสธ:</strong> "ขอบคุณมากนะคะ/ครับ ที่สนใจเข้าร่วม กิจกรรมนี้ต้องการความต่อเนื่องสูงเพราะ DIP กำหนดให้พัฒนาครบ 30 ชั่วโมง/กิจการตามสัญญา หากเงื่อนไขเรื่องเวลายังไม่ลงตัว ปีหน้าโครงการลักษณะนี้น่าจะมีอีก แนะนำให้ติดตามเพจ DIPROM ได้นะคะ/ครับ"
+        </div>
+      </section>
+
+      <!-- SCORED 2 -->
+      <section class="section">
+        <div class="section-title"><span class="num">2</span>📊 Scored Criteria (Scale 1–5, 70%)</div>
+        <div class="callout callout-warning">ประเมินเฉพาะเมื่อผ่าน Gate (ข้อ 1) แล้วเท่านั้น</div>
+
+        <!-- Q2 -->
+        <div class="score-block">
+          <div class="score-header">
+            <h3>ข้อ 2 — ความจำเป็นของเว็บไซต์/AI สำหรับธุรกิจ</h3>
+            <span class="weight-pill">20%</span>
+          </div>
+          <div class="measure">🎯 <strong>สิ่งที่วัด:</strong> เว็บ/AI ที่จะพัฒนา จะแก้ปัญหาธุรกิจอะไรได้จริงมั้ย — ถ้าไม่จำเป็นจริง = เสียงบประมาณ DIP</div>
+          <div class="q-main">❓ คำถามหลัก: "เว็บไซต์/AI ที่อยากได้ จะเอาไปแก้ปัญหาอะไรของธุรกิจตอนนี้?"</div>
+          <div class="q-followup">💬 คำถามตาม: "ตอนนี้ติดอะไร? ถ้าไม่ได้เว็บนี้ ธุรกิจจะเสียโอกาสยังไง?"</div>
+          <table class="rubric-table">
+            <thead><tr><th>คะแนน</th><th>คำตอบลักษณะนี้</th><th>ตัวอย่าง</th></tr></thead>
+            <tbody>
+              <tr><td class="score-cell s5">5</td><td>ระบุปัญหาธุรกิจชัด + อธิบายได้ว่าเว็บ/AI จะแก้ยังไงเป็นขั้นตอน + <strong>มีตัวเลขรองรับ</strong></td><td><em>"ลูกค้าโทรถามราคา 50 สาย/วัน — เว็บจะช่วยลดงาน admin 70% + AI ตอบ FAQ ได้"</em></td></tr>
+              <tr><td class="score-cell s4">4</td><td>ระบุปัญหาชัด + แนวคิดแก้สมเหตุสมผล แต่<strong>ไม่มีตัวเลข</strong>รองรับ</td><td><em>"ลูกค้าหาเราในเน็ตไม่เจอ ตอนนี้พึ่งแต่ปากต่อปาก"</em></td></tr>
+              <tr><td class="score-cell s3">3</td><td>รู้ว่าต้องมีเว็บ แต่บอกได้แค่กว้างๆ</td><td><em>"อยากได้ลูกค้าเพิ่ม", "อยากดูเป็นมืออาชีพ"</em></td></tr>
+              <tr><td class="score-cell s2">2</td><td>ตอบไม่ตรง / ลังเล</td><td><em>"ก็... อยากได้เหมือนคนอื่น"</em></td></tr>
+              <tr><td class="score-cell s1">1</td><td>ไม่รู้ว่าจะเอาเว็บไปทำอะไร</td><td><em>"ยังไม่แน่ใจครับ"</em></td></tr>
+            </tbody>
+          </table>
+          <div class="red-flag">🚩 <strong>Red flags:</strong> "อยากได้เพราะฟรี", "เพื่อนแนะนำ", "มีไว้เฉยๆ", "ใครๆ ก็มี"</div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="score-block">
+          <div class="score-header">
+            <h3>ข้อ 3 — สินค้า/บริการชัดเจน แข่งขันได้</h3>
+            <span class="weight-pill">15%</span>
+          </div>
+          <div class="measure">🎯 <strong>สิ่งที่วัด:</strong> ธุรกิจมีตัวสินค้า + target ลูกค้า + จุดต่างชัดมั้ย — ถ้าสินค้ายังเบลอ ทำเว็บไม่ช่วย</div>
+          <div class="q-main">❓ คำถามหลัก: "เล่าสินค้า/บริการที่ขายตอนนี้ ลูกค้าหลักคือใคร ต่างจากคู่แข่งยังไง?"</div>
+          <div class="q-followup">💬 คำถามตาม: "ทำไมลูกค้าถึงเลือกซื้อจากคุณ ไม่ซื้อจากคู่แข่ง?"</div>
+          <table class="rubric-table">
+            <thead><tr><th>คะแนน</th><th>คำตอบลักษณะนี้</th><th>ตัวอย่าง</th></tr></thead>
+            <tbody>
+              <tr><td class="score-cell s5">5</td><td>เล่าได้ครบ — product + target + USP + ราคา + positioning ชัดเจน</td><td><em>"ทำขนมเค้กกล่อง เน้น office worker กทม. ราคา 89–129 ใช้วัตถุดิบ premium ส่ง 30 นาที"</em></td></tr>
+              <tr><td class="score-cell s4">4</td><td>สินค้า + target ชัด แต่ <strong>USP ยังกว้าง</strong> ("ดีกว่า"/"ถูกกว่า")</td><td><em>"ขายกาแฟ ลูกค้าเป็นคนทำงาน — เน้นว่ารสชาติดีกว่า"</em></td></tr>
+              <tr><td class="score-cell s3">3</td><td>บอกสินค้าได้ แต่ target หรือ USP บอกไม่ชัด</td><td><em>"ขายเสื้อผ้าหลายแบบ ลูกค้าหลากหลาย"</em></td></tr>
+              <tr><td class="score-cell s2">2</td><td>สินค้ายังไม่ชัด / ขายหลายอย่างเกินไป / กำลังจะเริ่ม</td><td><em>"ขายของหลายอย่าง อะไรขายได้ก็ขาย"</em></td></tr>
+              <tr><td class="score-cell s1">1</td><td>ไม่มีสินค้าจริง / ยังไม่ได้เริ่ม / ไม่ตอบ</td><td><em>"ยังคิดอยู่ครับ"</em></td></tr>
+            </tbody>
+          </table>
+          <div class="red-flag">🚩 <strong>Red flags:</strong> "ลูกค้าคือทุกคน", "ขายอะไรก็ได้", "ยังไม่ได้เปิดร้าน"</div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="score-block">
+          <div class="score-header">
+            <h3>ข้อ 4 — ประสบการณ์ตลาดออนไลน์ที่ผ่านมา</h3>
+            <span class="weight-pill">12%</span>
+          </div>
+          <div class="measure">🎯 <strong>สิ่งที่วัด:</strong> มี baseline การตลาด online ก่อนเข้าโครงการมั้ย — ถ้ามี = วัดผลก่อน/หลังได้ + เป็น Success Case ง่าย</div>
+          <div class="q-main">❓ คำถามหลัก: "เคยทำ FB Ads / LINE OA / Shopee / TikTok มั้ย? ผลเป็นยังไง?"</div>
+          <div class="q-followup">💬 คำถามตาม: "เคยใช้งบเท่าไหร่/เดือน? ได้ลูกค้ามาจากที่ไหนบ้าง?"</div>
+          <table class="rubric-table">
+            <thead><tr><th>คะแนน</th><th>คำตอบลักษณะนี้</th><th>ตัวอย่าง</th></tr></thead>
+            <tbody>
+              <tr><td class="score-cell s5">5</td><td>ทำหลายช่องทาง + <strong>มีตัวเลขผล</strong> (CPL, ROAS, conversion) + วิเคราะห์ได้</td><td><em>"FB Ads 5,000/เดือน ได้ลูกค้า 30 คน CPL 167 บาท — TikTok ยังไม่ค่อย work"</em></td></tr>
+              <tr><td class="score-cell s4">4</td><td>ทำต่อเนื่อง + บอกผลคร่าวๆ + เข้าใจ logic</td><td><em>"ลง FB กับ Line ขายได้พอควร น่าจะเดือนละ 20–30 ออเดอร์"</em></td></tr>
+              <tr><td class="score-cell s3">3</td><td>เคยทำเล็กน้อย / ไม่มีระบบ แต่บอกได้ว่าผลออกมาทำไม</td><td><em>"ทำเองบ้าง ผลไม่ดีเพราะไม่ได้ตามทุกวัน"</em></td></tr>
+              <tr><td class="score-cell s2">2</td><td>เคยลอง แต่ไม่เข้าใจผลที่ออกมา</td><td><em>"เสียเงิน FB Ads ไปเยอะแต่ไม่รู้ว่าไป"</em></td></tr>
+              <tr><td class="score-cell s1">1</td><td>ไม่เคยทำเลย / ไม่รู้จัก</td><td><em>"ไม่เคยลงโฆษณาเลย"</em></td></tr>
+            </tbody>
+          </table>
+          <div class="red-flag">🚩 <strong>Red flags:</strong> "เคยเสียเงินไปเยอะ ไม่รู้ผล", "ลูกหลานทำให้ ผมไม่รู้รายละเอียด"</div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="score-block">
+          <div class="score-header">
+            <h3>ข้อ 5 — ความตั้งใจในการเข้าร่วม</h3>
+            <span class="weight-pill">10%</span>
+          </div>
+          <div class="measure">🎯 <strong>สิ่งที่วัด:</strong> จะทุ่มเวลาจริงมั้ย — Gate เช็คความเข้าใจ "เข้าได้" แต่ข้อนี้เช็ค <strong>ทัศนคติ + แผน</strong></div>
+          <div class="q-main">❓ คำถามหลัก: "30 ชั่วโมง 5 ครั้ง คือเรื่องใหญ่ — คุณเตรียมเวลายังไง? ใครจะมาแทนถ้าติดธุระ?"</div>
+          <table class="rubric-table">
+            <thead><tr><th>คะแนน</th><th>คำตอบลักษณะนี้</th><th>ตัวอย่าง</th></tr></thead>
+            <tbody>
+              <tr><td class="score-cell s5">5</td><td>เตรียมตัวมาก่อน + บอกได้ว่าจะจัดเวลายังไง + มีแผนสำรอง + กระตือรือร้นชัด</td><td><em>"เคลียร์ตารางแล้ว ปกติเข้างาน 9 โมง แต่ช่วงโครงการจะมาก่อน 8 โมง — มีน้องช่วยแทนช่วงเย็น"</em></td></tr>
+              <tr><td class="score-cell s4">4</td><td>เข้าใจว่าต้องทุ่ม + ตอบดี แต่ไม่มีแผนสำรอง</td><td><em>"ตั้งใจมาเองทุกครั้งครับ"</em></td></tr>
+              <tr><td class="score-cell s3">3</td><td>รับว่าเข้าได้ แต่ไม่บอกแผนชัด</td><td><em>"ไม่มีปัญหา ผมว่าจะมาได้"</em></td></tr>
+              <tr><td class="score-cell s2">2</td><td>ดูลังเล / "ลองดู" / "น่าจะ"</td><td><em>"ก็... น่าจะ ลองดูครับ"</em></td></tr>
+              <tr><td class="score-cell s1">1</td><td>บอกแล้วว่าน่าจะติดธุระ / ขอเลื่อนตั้งแต่สัมภาษณ์</td><td><em>"ผมไม่ค่อยว่าง ส่งพนักงานไปได้มั้ย"</em></td></tr>
+            </tbody>
+          </table>
+          <div class="red-flag">🚩 <strong>Red flags:</strong> "ส่งพนักงาน/ลูกชายไปแทน" (ผู้บริหารไม่เข้าเอง — ผิดเงื่อนไข)</div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="score-block">
+          <div class="score-header">
+            <h3>ข้อ 6 — ความพร้อมของช่องทางเดิม</h3>
+            <span class="weight-pill">8%</span>
+          </div>
+          <div class="measure">🎯 <strong>สิ่งที่วัด:</strong> มี asset พร้อมใช้ทันทีมั้ย (FB Page, LINE OA, รูปสินค้า, content) — ถ้ามี = พัฒนาเร็ว</div>
+          <div class="q-main">❓ คำถามหลัก: "ตอนนี้มี FB Page / LINE OA / รูปสินค้า / content อะไรพร้อมใช้บ้าง?"</div>
+          <table class="rubric-table">
+            <thead><tr><th>คะแนน</th><th>คำตอบลักษณะนี้</th></tr></thead>
+            <tbody>
+              <tr><td class="score-cell s5">5</td><td>มีครบ — FB Page + LINE OA + รูปสินค้าคุณภาพดี + คอนเทนต์ต่อเนื่อง</td></tr>
+              <tr><td class="score-cell s4">4</td><td>มี FB + LINE OA + รูปสินค้าพอใช้ + คอนเทนต์มีบ้าง</td></tr>
+              <tr><td class="score-cell s3">3</td><td>มี FB <strong>หรือ</strong> LINE OA อย่างใดอย่างหนึ่ง + รูปมีบ้าง</td></tr>
+              <tr><td class="score-cell s2">2</td><td>มี FB Page แต่ไม่ active / ไม่มีรูปที่ใช้ได้</td></tr>
+              <tr><td class="score-cell s1">1</td><td>ไม่มีช่องทางออนไลน์เลย หรือมีแต่ไม่ใช้</td></tr>
+            </tbody>
+          </table>
+          <div class="red-flag">🚩 <strong>Red flags:</strong> "ใช้รูปจาก Google มา", "FB ไม่ได้โพสมาปีนึงแล้ว"</div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="score-block">
+          <div class="score-header">
+            <h3>ข้อ 7 — ทักษะ digital + พร้อมเรียนรู้ AI</h3>
+            <span class="weight-pill">5%</span>
+          </div>
+          <div class="measure">🎯 <strong>สิ่งที่วัด:</strong> พื้นฐานพอเรียนได้มั้ย — ไม่ต้องเก่ง แต่ต้องไม่กลัวเทคโนโลยี</div>
+          <div class="q-main">❓ คำถามหลัก: "ทีมงานใช้เครื่องมือดิจิทัลอะไรอยู่บ้าง? เคยใช้ ChatGPT/AI tool มั้ย?"</div>
+          <table class="rubric-table">
+            <thead><tr><th>คะแนน</th><th>คำตอบลักษณะนี้</th></tr></thead>
+            <tbody>
+              <tr><td class="score-cell s5">5</td><td>ใช้ Google Workspace/Notion/Canva + เคยลอง AI tool + แสดงความสนใจชัด</td></tr>
+              <tr><td class="score-cell s4">4</td><td>ใช้ MS Office + Line + เคยลอง AI / อยากเรียนรู้</td></tr>
+              <tr><td class="score-cell s3">3</td><td>ใช้เครื่องมือพื้นฐาน + รู้จัก AI แต่ยังไม่ได้ใช้</td></tr>
+              <tr><td class="score-cell s2">2</td><td>ใช้แต่ Line + ไม่เคยลอง AI</td></tr>
+              <tr><td class="score-cell s1">1</td><td>ไม่ค่อยใช้คอม / กลัวเทคโนโลยี</td></tr>
+            </tbody>
+          </table>
+          <div class="red-flag">🚩 <strong>Red flags:</strong> "ให้ลูกหลานทำให้หมดเลย" (จะไม่ได้เรียนจริง)</div>
+        </div>
+      </section>
+
+      <!-- FLOW -->
+      <section class="section">
+        <div class="section-title"><span class="num">⏱</span>Flow สัมภาษณ์ 15 นาที</div>
+        <table>
+          <thead><tr><th>เวลา</th><th>ช่วง</th><th>กิจกรรม</th></tr></thead>
+          <tbody>
+            <tr><td>0:00 – 0:30</td><td>เปิด</td><td>แนะนำตัวกรรมการ + บอกว่าจะใช้เวลา 15 นาที</td></tr>
+            <tr style="background:#ffebee;"><td>0:30 – 2:30</td><td><strong>🚪 ข้อ 1 Gate</strong></td><td>ถาม 4 คำถามความพร้อม → ถ้าไม่ผ่าน หยุดที่นี่</td></tr>
+            <tr><td>2:30 – 5:00</td><td>ข้อ 2 จำเป็น</td><td>2.5 นาที</td></tr>
+            <tr><td>5:00 – 7:00</td><td>ข้อ 3 สินค้า</td><td>2 นาที</td></tr>
+            <tr><td>7:00 – 9:00</td><td>ข้อ 4 ประสบการณ์ online</td><td>2 นาที</td></tr>
+            <tr><td>9:00 – 10:30</td><td>ข้อ 5 ตั้งใจ</td><td>1.5 นาที</td></tr>
+            <tr><td>10:30 – 12:00</td><td>ข้อ 6 ช่องทางเดิม</td><td>1.5 นาที</td></tr>
+            <tr><td>12:00 – 13:30</td><td>ข้อ 7 ทักษะ digital</td><td>1.5 นาที</td></tr>
+            <tr><td>13:30 – 15:00</td><td>ปิด</td><td>ผู้สมัครถามคำถาม + บอกว่าจะประกาศผล 8 มิ.ย.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- DECISION RULE -->
+      <section class="section">
+        <div class="section-title"><span class="num">🎯</span>Decision Rule (หลังสัมภาษณ์เสร็จทั้ง 30 ราย)</div>
+        <ol class="decision-list">
+          <li><strong>คัดคนที่ไม่ผ่าน Gate</strong> (ข้อ 1 = 0) ออกก่อน → ไม่นำมาจัดอันดับ</li>
+          <li><strong>เรียงคนที่ผ่าน Gate</strong> ตามคะแนนรวมจากมากไปน้อย → เลือก top 15</li>
+          <li><strong>ถ้าคะแนนเสมอ</strong> ใช้ลำดับ: ข้อ 2 → ข้อ 3 → ข้อ 4 → ลำดับสมัคร</li>
+          <li><strong>กระจายสาขา</strong> — พยายามให้มีทุกสาขาเป้าหมาย อย่างน้อย 2 ราย/สาขา (ถ้าคะแนนใกล้กัน)</li>
+          <li><strong>กระจายพื้นที่</strong> — ไม่กระจุกจังหวัดเดียวเกิน 60%</li>
+          <li><strong>เสนอ DIP เห็นชอบ</strong> 6–7 มิ.ย. → ประกาศผล 8 มิ.ย.</li>
+        </ol>
+      </section>
+
+      <!-- WARNINGS -->
+      <section class="section">
+        <div class="section-title"><span class="num">⚠</span>ข้อควรระวังของกรรมการ</div>
+        <div class="callout callout-warning">
+          <strong>อย่าถามนำ</strong> — เช่น "คุณคงพร้อมเข้าใช่มั้ย?" → ผู้สมัครจะตอบใช่อัตโนมัติ<br>
+          ใช้คำถามปลายเปิด: "ช่วงไหนที่ติดธุระบ้าง?"
+        </div>
+        <div class="callout callout-warning">
+          <strong>อย่าเร่งให้ผ่าน Gate</strong> — ถ้าผู้สมัครลังเล = ถือเป็น "ไม่ใช่"
+        </div>
+        <div class="callout callout-info">
+          <strong>บันทึก quote ที่น่าสนใจ</strong> — ใช้ตอนเรียงลำดับถ้าเสมอ
+        </div>
+        <div class="callout callout-info">
+          <strong>ใช้เวลาให้ครบ 15 นาที</strong> — เพื่อความยุติธรรม (ไม่จบเร็วเกินไปแม้คะแนนชัดแล้ว)
+        </div>
+        <div class="callout callout-danger">
+          <strong>ห้ามให้ feedback ทันที</strong> — บอกแค่ "จะประกาศผล 8 มิ.ย."
+        </div>
+      </section>
+
+      <!-- FORM PREVIEW -->
+      <section class="section">
+        <div class="section-title"><span class="num">📝</span>แบบฟอร์มกรอกสด (Print แจกกรรมการ)</div>
+        <div class="form-preview">═══════════════════════════════════════════════════════════════
+ชื่อกิจการ: _________________________  ลำดับคิว: บ.#____
+ผู้ตอบ (ชื่อ + ตำแหน่ง): _________________________________
+สาขา: ☐ ดิจิทัล ☐ เกษตรแปรรูป ☐ อาหารแปรรูป ☐ แฟชั่น ☐ อื่นๆ
+จังหวัด: ☐ กทม ☐ นนท ☐ ปท ☐ สระบุรี ☐ อยุธยา ☐ สมุทรปราการ
+วัน/เวลา: ___ มิ.ย. 2569  ___:___ น.   ผู้สัมภาษณ์: ______________
+═══════════════════════════════════════════════════════════════
+
+🚪 ข้อ 1 — Gate (Binary 5 หรือ 0)
+   1a. พิธีเปิด 11 มิ.ย. 09:00       ☐ ใช่  ☐ ไม่ใช่
+   1b. Group Sessions × 4           ☐ ใช่  ☐ ไม่ใช่
+   1c. on-site × 5 ครั้ง (30 ชม.)   ☐ ใช่  ☐ ไม่ใช่
+   1d. i-industry ก่อน 23 มิ.ย.     ☐ ใช่  ☐ ไม่ใช่
+   ►► ผ่าน Gate? ☐ ใช่ (= 5) → ทำต่อ   ☐ ไม่ใช่ (= 0) → REJECT
+
+═══════════════════════════════════════════════════════════════
+ข้อ        คะแนน (1–5)    น้ำหนัก    คะแนน × น้ำหนัก
+─────────────────────────────────────────────────────
+1 Gate         /5            30          ____
+2 จำเป็น        /5            20          ____
+3 สินค้าชัด    /5            15          ____
+4 ประสบการณ์   /5            12          ____
+5 ตั้งใจ        /5            10          ____
+6 ช่องทางเดิม  /5             8          ____
+7 ทักษะ digital /5             5          ____
+─────────────────────────────────────────────────────
+รวม (÷ 5)                              ____ / 100
+═══════════════════════════════════════════════════════════════
+
+ข้อสังเกตเพิ่มเติม (จุดเด่น/จุดอ่อน):
+___________________________________________________________
+___________________________________________________________
+___________________________________________________________
+
+แนะนำ:  ☐ รับ (Pass Gate + คะแนนดี)
+        ☐ สำรอง (Pass Gate แต่คะแนนกลางๆ)
+        ☐ ไม่รับ (Reject Gate หรือคะแนนต่ำ)
+
+ลายเซ็นกรรมการ: ______________________</div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>
