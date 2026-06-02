@@ -306,6 +306,8 @@
     <div class="progress" id="progress">
       นัดแล้ว <span class="num" id="booked-count">0</span>/30 · ติดต่อไม่ได้ <span class="num" style="color:#c79100;font-size:13px" id="unable-count">0</span>
     </div>
+    <button class="btn" id="btn-export-data" style="background:#7c4d00;color:white;border-color:#7c4d00" title="Export ข้อมูลทุกอย่างเป็น JSON (สำหรับโอนย้ายระหว่าง browser/host)">📤 Export ข้อมูล</button>
+      <button class="btn" id="btn-import-data" style="background:#1565c0;color:white;border-color:#1565c0" title="Import ข้อมูลจากไฟล์ JSON">📥 Import ข้อมูล</button>
     <button class="btn btn-schedule" id="show-schedule">📅 ดูตารางสัมภาษณ์</button>
     <button class="btn btn-export" id="export-final">📥 Export 30 คน</button>
   </div>
@@ -396,6 +398,57 @@ function slotToRank(slotId) {
   }
   return null;
 }
+
+
+// === Export / Import all localStorage data ===
+const STORAGE_KEYS = ['aoo_status_v6', 'aoo_comments_v1', 'aoo_call_status_v2', 'aoo_bookings_v1', 'aoo_prep_v1', 'aoo_checklist_v1', 'aoo_result_v1', 'aoo_final_v1', 'aoo_called_v1'];
+
+function exportData() {
+  const data = {};
+  STORAGE_KEYS.forEach(k => {
+    const v = localStorage.getItem(k);
+    if (v !== null) data[k] = v;
+  });
+  data._exported_at = new Date().toISOString();
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aoo-dip-data-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!confirm('นำเข้าข้อมูลจากไฟล์นี้? ข้อมูลปัจจุบันจะถูกเขียนทับ')) return;
+        Object.entries(data).forEach(([k, v]) => {
+          if (k.startsWith('_')) return;
+          if (STORAGE_KEYS.includes(k) && typeof v === 'string') {
+            localStorage.setItem(k, v);
+          }
+        });
+        alert('นำเข้าข้อมูลสำเร็จ — รีเฟรชหน้าเว็บเพื่อแสดงผล');
+        location.reload();
+      } catch (err) {
+        alert('ไฟล์ไม่ถูกต้อง: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 
 function scoreClass(s) {
   if (s === 10) return 's10'; if (s === 9) return 's9';
@@ -856,6 +909,10 @@ document.getElementById('export-final').onclick = () => {
   const date = new Date().toISOString().slice(0,10);
   XLSX.writeFile(wb, `AOO DIP - นัดสัมภาษณ์ ${bookedRanks.length}คน ${date}.xlsx`);
 };
+
+
+document.getElementById('btn-export-data').onclick = exportData;
+document.getElementById('btn-import-data').onclick = importData;
 
 render();
 </script>
