@@ -232,8 +232,8 @@
       <span class="stat-rej">✗ <b id="rej-count">0</b></span> ·
       ยังไม่เช็ค <b id="unc-count">130</b>
       <button class="btn" id="export-xlsx" style="margin-left:8px;background:#2d8a47;color:white;border-color:#2d8a47;font-weight:600;">📥 Export Excel (เฉพาะสัมภาษณ์)</button>
-      <button class="btn" id="btn-export-data" style="background:#7c4d00;color:white;border-color:#7c4d00" title="Export ข้อมูลทุกอย่างเป็น JSON (สำหรับโอนย้ายระหว่าง browser/host)">📤 Export ข้อมูล</button>
-      <button class="btn" id="btn-import-data" style="background:#1565c0;color:white;border-color:#1565c0" title="Import ข้อมูลจากไฟล์ JSON">📥 Import ข้อมูล</button>
+      <button class="btn" id="btn-export-data" style="background:#7c4d00;color:white;border-color:#7c4d00" title="Export สถานะทั้งหมดเป็น Excel — ใช้โอนข้อมูลระหว่าง browser/host">📤 Export Excel สถานะ</button>
+      <button class="btn" id="btn-import-data" style="background:#1565c0;color:white;border-color:#1565c0" title="Import สถานะจากไฟล์ Excel">📥 Import Excel สถานะ</button>
       <button class="btn btn-clear" id="clear-picks" style="margin-left:4px;">ล้าง</button>
     </div>
   </div>
@@ -288,51 +288,113 @@ function setStatus(rank, newStatus) {
 }
 
 
-// === Export / Import all localStorage data ===
-const STORAGE_KEYS = ['aoo_status_v6', 'aoo_comments_v1', 'aoo_call_status_v2', 'aoo_bookings_v1', 'aoo_prep_v1', 'aoo_checklist_v1', 'aoo_result_v1', 'aoo_final_v1', 'aoo_called_v1'];
+// === Export / Import state as Excel ===
+const STATE_HEADERS = ['#', 'ชื่อ', 'บริษัท',
+  'สถานะคัด(interview/reject)', 'สถานะโทร(called/unable)',
+  'จองเวลา(slot 1-30)', 'ผู้โทร(amp/em)', 'Notebook(Y/N)', 'ว่าง11มิย(Y/N)',
+  'กลุ่ม1พุธ(Y/N)', 'กลุ่ม2จันทร์(Y/N)',
+  'ผลคัด(pass/fail)', 'Comment', 'Prep'];
 
 function exportData() {
-  const data = {};
-  STORAGE_KEYS.forEach(k => {
-    const v = localStorage.getItem(k);
-    if (v !== null) data[k] = v;
+  const screening = JSON.parse(localStorage.getItem('aoo_status_v6') || '{}');
+  const call = JSON.parse(localStorage.getItem('aoo_call_status_v2') || '{}');
+  const bookings = JSON.parse(localStorage.getItem('aoo_bookings_v1') || '{}');
+  const checklist = JSON.parse(localStorage.getItem('aoo_checklist_v1') || '{}');
+  const results = JSON.parse(localStorage.getItem('aoo_result_v1') || '{}');
+  const comments = JSON.parse(localStorage.getItem('aoo_comments_v1') || '{}');
+  const preps = JSON.parse(localStorage.getItem('aoo_prep_v1') || '{}');
+  const callerData = JSON.parse(localStorage.getItem('aoo_caller_v1') || '{}');
+
+  const allData = (typeof ALL_DATA !== 'undefined') ? ALL_DATA : DATA;
+  const rows = [STATE_HEADERS];
+  allData.forEach(d => {
+    const c = checklist[d.rank] || {};
+    rows.push([
+      d.rank,
+      `${d.prefix||''}${d.name||''}`,
+      d.biz || '',
+      screening[d.rank] || '',
+      call[d.rank] || '',
+      bookings[d.rank] || '',
+      callerData[d.rank] || '',
+      c.nb ? 'Y' : '',
+      c.open ? 'Y' : '',
+      (c.g1 || c.group === '1') ? 'Y' : '',
+      (c.g2 || c.group === '2') ? 'Y' : '',
+      results[d.rank] || '',
+      comments[d.rank] || '',
+      preps[d.rank] || '',
+    ]);
   });
-  data._exported_at = new Date().toISOString();
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `aoo-dip-data-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = STATE_HEADERS.map((h, i) => {
+    const lens = rows.map(row => String(row[i] || '').length);
+    return {wch: Math.min(50, Math.max(8, ...lens))};
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'State');
+  const date = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `aoo-dip-state-${date}.xlsx`);
 }
 
 function importData() {
   const input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.json,application/json';
+  input.accept = '.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   input.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const data = JSON.parse(ev.target.result);
-        if (!confirm('นำเข้าข้อมูลจากไฟล์นี้? ข้อมูลปัจจุบันจะถูกเขียนทับ')) return;
-        Object.entries(data).forEach(([k, v]) => {
-          if (k.startsWith('_')) return;
-          if (STORAGE_KEYS.includes(k) && typeof v === 'string') {
-            localStorage.setItem(k, v);
-          }
-        });
-        alert('นำเข้าข้อมูลสำเร็จ — รีเฟรชหน้าเว็บเพื่อแสดงผล');
+        const wb = XLSX.read(ev.target.result, {type: 'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ''});
+        if (rows.length < 2) { alert('ไฟล์ว่างหรือไม่ถูกต้อง'); return; }
+
+        if (!confirm(`นำเข้าข้อมูล ${rows.length-1} แถว — ข้อมูลปัจจุบันจะถูกเขียนทับ?`)) return;
+
+        const screening = {}, call = {}, bookings = {}, checklist = {},
+              results = {}, comments = {}, preps = {}, callerImport = {};
+        let imported = 0;
+        for (let i = 1; i < rows.length; i++) {
+          const r = rows[i];
+          const rank = parseInt(r[0]);
+          if (!rank) continue;
+          imported++;
+          if (r[3]) screening[rank] = String(r[3]).trim();
+          if (r[4]) call[rank] = String(r[4]).trim();
+          if (r[5]) bookings[rank] = String(r[5]).trim();
+          if (r[6]) callerImport[rank] = String(r[6]).trim();
+          const c = {};
+          if (String(r[7]).toUpperCase() === 'Y') c.nb = true;
+          if (String(r[8]).toUpperCase() === 'Y') c.open = true;
+          if (String(r[9]).toUpperCase() === 'Y') c.g1 = true;
+          if (String(r[10]).toUpperCase() === 'Y') c.g2 = true;
+          if (Object.keys(c).length > 0) checklist[rank] = c;
+          if (r[11]) results[rank] = String(r[11]).trim();
+          if (r[12]) comments[rank] = String(r[12]);
+          if (r[13]) preps[rank] = String(r[13]);
+        }
+
+        localStorage.setItem('aoo_status_v6', JSON.stringify(screening));
+        localStorage.setItem('aoo_call_status_v2', JSON.stringify(call));
+        localStorage.setItem('aoo_bookings_v1', JSON.stringify(bookings));
+        localStorage.setItem('aoo_checklist_v1', JSON.stringify(checklist));
+        localStorage.setItem('aoo_result_v1', JSON.stringify(results));
+        localStorage.setItem('aoo_comments_v1', JSON.stringify(comments));
+        localStorage.setItem('aoo_prep_v1', JSON.stringify(preps));
+        localStorage.setItem('aoo_caller_v1', JSON.stringify(callerImport));
+
+        alert(`นำเข้าสำเร็จ ${imported} แถว — รีเฟรชหน้าเว็บ`);
         location.reload();
       } catch (err) {
         alert('ไฟล์ไม่ถูกต้อง: ' + err.message);
+        console.error(err);
       }
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
   input.click();
 }

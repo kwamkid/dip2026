@@ -138,6 +138,20 @@
   }
   .status-btn:hover { background: var(--bg); }
   .status-btn.called.on { background: #5598ff; color: white; border-color: #5598ff; }
+  .caller-row { display: flex; gap: 2px; margin-bottom: 3px; }
+  .caller-btn {
+    flex: 1; padding: 3px 0; border: 1px solid var(--border); border-radius: 3px;
+    cursor: pointer; font-size: 11px; font-weight: 600; font-family: inherit;
+    background: var(--card);
+  }
+  .caller-btn:hover { background: var(--bg); }
+  .caller-btn.amp { color: #7c3aed; }
+  .caller-btn.amp.on { background: #7c3aed; color: white; border-color: #7c3aed; }
+  .caller-btn.em { color: #0891b2; }
+  .caller-btn.em.on { background: #0891b2; color: white; border-color: #0891b2; }
+  tbody tr.caller-amp { box-shadow: inset 4px 0 0 #7c3aed; }
+  tbody tr.caller-em { box-shadow: inset 4px 0 0 #0891b2; }
+
   .checklist-cell { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }
   .checklist-cell label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
   .checklist-cell input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; accent-color: var(--green); }
@@ -296,18 +310,23 @@
   <div class="controls">
     <input type="text" id="search" placeholder="ค้นหา ชื่อ/บริษัท/comment...">
     <div class="filter-btns">
-      <button class="btn active" data-filter="all">ทั้งหมด</button>
-      <button class="btn" data-filter="unable" style="color:#c79100;border-color:#f9a825">☎✗ ติดต่อไม่ได้</button>
+      <button class="btn active" data-filter="pending">⏳ ยังไม่ได้คัด</button>
+      <button class="btn" data-filter="decided">✅ คัดแล้ว</button>
+      <button class="btn" data-filter="all">ทั้งหมด</button>
       <button class="btn" data-filter="booked">นัดแล้ว ⭐</button>
-      <button class="btn" data-filter="not-booked">ยังไม่นัด</button>
       <button class="btn" data-filter="pass" style="color:var(--green);border-color:var(--green)">✓ ผ่าน</button>
       <button class="btn" data-filter="fail" style="color:var(--red);border-color:var(--red)">✗ ไม่ผ่าน</button>
+      <button class="btn" data-filter="unable" style="color:#c79100;border-color:#f9a825">☎✗ ติดต่อไม่ได้</button>
+      <button class="btn" data-filter="amp" style="color:#7c3aed;border-color:#7c3aed">แอม</button>
+      <button class="btn" data-filter="em" style="color:#0891b2;border-color:#0891b2">เอ็ม</button>
+      <button class="btn" data-filter="unclaimed">ยังไม่ claim</button>
     </div>
     <div class="progress" id="progress">
       นัดแล้ว <span class="num" id="booked-count">0</span>/30 · ติดต่อไม่ได้ <span class="num" style="color:#c79100;font-size:13px" id="unable-count">0</span>
+      <br><span style="font-size:11px">แอม <b style="color:#7c3aed" id="amp-count">0</b> · เอ็ม <b style="color:#0891b2" id="em-count">0</b></span>
     </div>
-    <button class="btn" id="btn-export-data" style="background:#7c4d00;color:white;border-color:#7c4d00" title="Export ข้อมูลทุกอย่างเป็น JSON (สำหรับโอนย้ายระหว่าง browser/host)">📤 Export ข้อมูล</button>
-      <button class="btn" id="btn-import-data" style="background:#1565c0;color:white;border-color:#1565c0" title="Import ข้อมูลจากไฟล์ JSON">📥 Import ข้อมูล</button>
+    <button class="btn" id="btn-export-data" style="background:#7c4d00;color:white;border-color:#7c4d00" title="Export สถานะทั้งหมดเป็น Excel — ใช้โอนข้อมูลระหว่าง browser/host">📤 Export Excel สถานะ</button>
+      <button class="btn" id="btn-import-data" style="background:#1565c0;color:white;border-color:#1565c0" title="Import สถานะจากไฟล์ Excel">📥 Import Excel สถานะ</button>
     <button class="btn btn-schedule" id="show-schedule">📅 ดูตารางสัมภาษณ์</button>
     <button class="btn btn-export" id="export-final">📥 Export 30 คน</button>
   </div>
@@ -374,6 +393,7 @@ let comments = JSON.parse(localStorage.getItem('aoo_comments_v1') || '{}');
 let preps = JSON.parse(localStorage.getItem('aoo_prep_v1') || '{}');
 let checklist = JSON.parse(localStorage.getItem('aoo_checklist_v1') || '{}'); // {rank: {nb,open,group}}
 let results = JSON.parse(localStorage.getItem('aoo_result_v1') || '{}'); // {rank: 'pass'|'fail'}
+let callers = JSON.parse(localStorage.getItem('aoo_caller_v1') || '{}'); // {rank: 'amp'|'em'}
 let callStatus = JSON.parse(localStorage.getItem('aoo_call_status_v2') || 'null');
 if (callStatus === null) {
   callStatus = {};
@@ -388,6 +408,7 @@ function saveComments() { save('aoo_comments_v1', comments); }
 function savePreps()    { save('aoo_prep_v1', preps); }
 function saveChecklist() { save('aoo_checklist_v1', checklist); }
 function saveResults()   { save('aoo_result_v1', results); }
+function saveCallers()   { save('aoo_caller_v1', callers); }
 function saveCallStatus() { save('aoo_call_status_v2', callStatus); }
 function saveBookings() { save('aoo_bookings_v1', bookings); }
 
@@ -400,51 +421,113 @@ function slotToRank(slotId) {
 }
 
 
-// === Export / Import all localStorage data ===
-const STORAGE_KEYS = ['aoo_status_v6', 'aoo_comments_v1', 'aoo_call_status_v2', 'aoo_bookings_v1', 'aoo_prep_v1', 'aoo_checklist_v1', 'aoo_result_v1', 'aoo_final_v1', 'aoo_called_v1'];
+// === Export / Import state as Excel ===
+const STATE_HEADERS = ['#', 'ชื่อ', 'บริษัท',
+  'สถานะคัด(interview/reject)', 'สถานะโทร(called/unable)',
+  'จองเวลา(slot 1-30)', 'ผู้โทร(amp/em)', 'Notebook(Y/N)', 'ว่าง11มิย(Y/N)',
+  'กลุ่ม1พุธ(Y/N)', 'กลุ่ม2จันทร์(Y/N)',
+  'ผลคัด(pass/fail)', 'Comment', 'Prep'];
 
 function exportData() {
-  const data = {};
-  STORAGE_KEYS.forEach(k => {
-    const v = localStorage.getItem(k);
-    if (v !== null) data[k] = v;
+  const screening = JSON.parse(localStorage.getItem('aoo_status_v6') || '{}');
+  const call = JSON.parse(localStorage.getItem('aoo_call_status_v2') || '{}');
+  const bookings = JSON.parse(localStorage.getItem('aoo_bookings_v1') || '{}');
+  const checklist = JSON.parse(localStorage.getItem('aoo_checklist_v1') || '{}');
+  const results = JSON.parse(localStorage.getItem('aoo_result_v1') || '{}');
+  const comments = JSON.parse(localStorage.getItem('aoo_comments_v1') || '{}');
+  const preps = JSON.parse(localStorage.getItem('aoo_prep_v1') || '{}');
+  const callerData = JSON.parse(localStorage.getItem('aoo_caller_v1') || '{}');
+
+  const allData = (typeof ALL_DATA !== 'undefined') ? ALL_DATA : DATA;
+  const rows = [STATE_HEADERS];
+  allData.forEach(d => {
+    const c = checklist[d.rank] || {};
+    rows.push([
+      d.rank,
+      `${d.prefix||''}${d.name||''}`,
+      d.biz || '',
+      screening[d.rank] || '',
+      call[d.rank] || '',
+      bookings[d.rank] || '',
+      callerData[d.rank] || '',
+      c.nb ? 'Y' : '',
+      c.open ? 'Y' : '',
+      (c.g1 || c.group === '1') ? 'Y' : '',
+      (c.g2 || c.group === '2') ? 'Y' : '',
+      results[d.rank] || '',
+      comments[d.rank] || '',
+      preps[d.rank] || '',
+    ]);
   });
-  data._exported_at = new Date().toISOString();
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `aoo-dip-data-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = STATE_HEADERS.map((h, i) => {
+    const lens = rows.map(row => String(row[i] || '').length);
+    return {wch: Math.min(50, Math.max(8, ...lens))};
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'State');
+  const date = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `aoo-dip-state-${date}.xlsx`);
 }
 
 function importData() {
   const input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.json,application/json';
+  input.accept = '.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   input.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const data = JSON.parse(ev.target.result);
-        if (!confirm('นำเข้าข้อมูลจากไฟล์นี้? ข้อมูลปัจจุบันจะถูกเขียนทับ')) return;
-        Object.entries(data).forEach(([k, v]) => {
-          if (k.startsWith('_')) return;
-          if (STORAGE_KEYS.includes(k) && typeof v === 'string') {
-            localStorage.setItem(k, v);
-          }
-        });
-        alert('นำเข้าข้อมูลสำเร็จ — รีเฟรชหน้าเว็บเพื่อแสดงผล');
+        const wb = XLSX.read(ev.target.result, {type: 'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ''});
+        if (rows.length < 2) { alert('ไฟล์ว่างหรือไม่ถูกต้อง'); return; }
+
+        if (!confirm(`นำเข้าข้อมูล ${rows.length-1} แถว — ข้อมูลปัจจุบันจะถูกเขียนทับ?`)) return;
+
+        const screening = {}, call = {}, bookings = {}, checklist = {},
+              results = {}, comments = {}, preps = {}, callerImport = {};
+        let imported = 0;
+        for (let i = 1; i < rows.length; i++) {
+          const r = rows[i];
+          const rank = parseInt(r[0]);
+          if (!rank) continue;
+          imported++;
+          if (r[3]) screening[rank] = String(r[3]).trim();
+          if (r[4]) call[rank] = String(r[4]).trim();
+          if (r[5]) bookings[rank] = String(r[5]).trim();
+          if (r[6]) callerImport[rank] = String(r[6]).trim();
+          const c = {};
+          if (String(r[7]).toUpperCase() === 'Y') c.nb = true;
+          if (String(r[8]).toUpperCase() === 'Y') c.open = true;
+          if (String(r[9]).toUpperCase() === 'Y') c.g1 = true;
+          if (String(r[10]).toUpperCase() === 'Y') c.g2 = true;
+          if (Object.keys(c).length > 0) checklist[rank] = c;
+          if (r[11]) results[rank] = String(r[11]).trim();
+          if (r[12]) comments[rank] = String(r[12]);
+          if (r[13]) preps[rank] = String(r[13]);
+        }
+
+        localStorage.setItem('aoo_status_v6', JSON.stringify(screening));
+        localStorage.setItem('aoo_call_status_v2', JSON.stringify(call));
+        localStorage.setItem('aoo_bookings_v1', JSON.stringify(bookings));
+        localStorage.setItem('aoo_checklist_v1', JSON.stringify(checklist));
+        localStorage.setItem('aoo_result_v1', JSON.stringify(results));
+        localStorage.setItem('aoo_comments_v1', JSON.stringify(comments));
+        localStorage.setItem('aoo_prep_v1', JSON.stringify(preps));
+        localStorage.setItem('aoo_caller_v1', JSON.stringify(callerImport));
+
+        alert(`นำเข้าสำเร็จ ${imported} แถว — รีเฟรชหน้าเว็บ`);
         location.reload();
       } catch (err) {
         alert('ไฟล์ไม่ถูกต้อง: ' + err.message);
+        console.error(err);
       }
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
   input.click();
 }
@@ -574,7 +657,7 @@ function renderResult(rank) {
   `;
 }
 
-let currentFilter = 'all';
+let currentFilter = 'pending';
 let currentSearch = '';
 const expandedReason = new Set();
 
@@ -617,7 +700,12 @@ function render() {
     const hasComment = comment.trim().length > 0;
 
     let pass = true;
-    if (currentFilter === 'unable') pass = isUnable;
+    if (currentFilter === 'pending') pass = !results[d.rank];
+    else if (currentFilter === 'decided') pass = !!results[d.rank];
+    else if (currentFilter === 'unable') pass = isUnable;
+    else if (currentFilter === 'amp') pass = callers[d.rank] === 'amp';
+    else if (currentFilter === 'em') pass = callers[d.rank] === 'em';
+    else if (currentFilter === 'unclaimed') pass = !callers[d.rank];
     else if (currentFilter === 'booked') pass = isBooked;
     else if (currentFilter === 'not-booked') pass = !isBooked;
     else if (currentFilter === 'pass') pass = results[d.rank] === 'pass';
@@ -631,7 +719,8 @@ function render() {
     const tr = document.createElement('tr');
     tr.dataset.rank = d.rank;
     const result = results[d.rank] || '';
-    tr.className = (isBooked ? 'booked ' : '') + (isCalled ? 'called' : '') + (isUnable ? ' unable-row' : '') + (result ? ' result-' + result : '');
+    const caller = callers[d.rank] || '';
+    tr.className = (isBooked ? 'booked ' : '') + (isCalled ? 'called' : '') + (isUnable ? ' unable-row' : '') + (result ? ' result-' + result : '') + (caller ? ' caller-' + caller : '');
 
     const aiBadge = d.ai_suspect ? '<span class="ai-mini">AI</span>' : '';
     const sc = scoreClass(d.score);
@@ -640,6 +729,10 @@ function render() {
 
     tr.innerHTML = `
       <td class="status-cell">
+        <div class="caller-row">
+          <button class="caller-btn amp ${callers[d.rank]==='amp'?'on':''}" data-caller="${d.rank}" data-name="amp" title="แอมจะโทร">แอม</button>
+          <button class="caller-btn em ${callers[d.rank]==='em'?'on':''}" data-caller="${d.rank}" data-name="em" title="เอ็มจะโทร">เอ็ม</button>
+        </div>
         <button class="status-btn unable ${isUnable?'on':''}" data-callstatus="${d.rank}" data-newstatus="unable" title="ติดต่อไม่ได้ จะโทรอีกรอบ">${isUnable?'☎✗ ติดต่อไม่ได้':'+ ติดต่อไม่ได้'}</button>
       </td>
       <td class="center" style="font-size:11px;color:var(--muted)">${d.rank}</td>
@@ -712,6 +805,17 @@ function attachHandlers() {
     };
   });
 
+  document.querySelectorAll('[data-caller]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const r = btn.dataset.caller;
+      const name = btn.dataset.name;
+      if (callers[r] === name) delete callers[r];
+      else callers[r] = name;
+      saveCallers();
+      render();
+    };
+  });
   document.querySelectorAll('input[type=checkbox][data-check]').forEach(cb => {
     cb.onclick = (e) => {
       e.stopPropagation();
@@ -775,6 +879,8 @@ function updateProgress() {
   const n = Object.keys(bookings).length;
   document.getElementById('booked-count').textContent = n;
   document.getElementById('unable-count').textContent = Object.values(callStatus).filter(v => v === 'unable').length;
+  document.getElementById('amp-count').textContent = Object.values(callers).filter(v => v === 'amp').length;
+  document.getElementById('em-count').textContent = Object.values(callers).filter(v => v === 'em').length;
   document.getElementById('progress').classList.toggle('full', n >= 30);
 }
 
