@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Interview Score Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 12mm 14mm 12mm 14mm; }
+  @media print { .print-banner { display: none !important; } }
+  .print-banner {
+    background: #5a2d82;
+    color: white;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 8px;
+    margin: 16px auto;
+    max-width: 800px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+  }
+  .print-banner button {
+    background: white;
+    color: #5a2d82;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    margin-left: 12px;
+    font-family: inherit;
+  }
+  .print-banner button:hover { background: #f0e7f7; }
+  .print-banner kbd {
+    background: rgba(255,255,255,0.25);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans Thai', 'Sarabun', sans-serif;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.35;
+  }
+
+  /* HEADER */
+  .doc-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 14pt;
+    margin-bottom: 2px;
+  }
+  .doc-sub {
+    text-align: center;
+    font-size: 9.5pt;
+    color: #444;
+    margin-bottom: 8px;
+  }
+  .info-bar {
+    border: 1.2px solid #000;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 10pt;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 18px;
+  }
+  .info-bar .field { display: inline-block; }
+  .info-bar .label { font-weight: 600; }
+  .info-bar .blank {
+    display: inline-block;
+    border-bottom: 1px solid #000;
+    min-width: 130px;
+    margin-left: 4px;
+    padding: 0 4px;
+  }
+
+  /* GATE BLOCK */
+  .gate {
+    border: 1.8px solid #b71c1c;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background: #fff8f8;
+  }
+  .gate-title {
+    font-weight: 700;
+    font-size: 11pt;
+    color: #b71c1c;
+    margin-bottom: 4px;
+  }
+  .gate ol {
+    margin: 0 0 4px 18px;
+    font-size: 10pt;
+  }
+  .gate ol li { margin-bottom: 2px; }
+  .gate-result {
+    font-weight: 700;
+    font-size: 10.5pt;
+    padding-top: 4px;
+    border-top: 1px dashed #b71c1c;
+    margin-top: 4px;
+  }
+  .check { display: inline-block; width: 11px; height: 11px; border: 1.2px solid #000; vertical-align: middle; margin-right: 3px; }
+
+  /* SCORED CRITERIA */
+  .crit {
+    border: 1px solid #888;
+    border-radius: 4px;
+    padding: 6px 9px;
+    margin-bottom: 6px;
+    background: #fff;
+    page-break-inside: avoid;
+  }
+  .crit-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 3px;
+  }
+  .crit-title { font-weight: 700; font-size: 10.5pt; }
+  .crit-weight { font-weight: 700; font-size: 10pt; color: #5a2d82; background: #f0e7f7; padding: 1px 7px; border-radius: 9px; }
+  .crit-q {
+    font-size: 10pt;
+    margin-bottom: 3px;
+  }
+  .crit-q strong { font-weight: 700; }
+  .rubric {
+    font-size: 9pt;
+    color: #222;
+    line-height: 1.4;
+    border-top: 1px dashed #ccc;
+    padding-top: 4px;
+    margin-top: 3px;
+    column-count: 2;
+    column-gap: 14px;
+  }
+  .rubric .r {
+    display: block;
+    padding: 1px 0 2px 22px;
+    position: relative;
+    break-inside: avoid;
+  }
+  .rubric .r-num {
+    position: absolute;
+    left: 0; top: 1px;
+    font-weight: 700;
+    background: #f0e7f7;
+    color: #5a2d82;
+    width: 16px; height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-size: 9pt;
+  }
+  .score-box {
+    display: inline-block;
+    border: 1.2px solid #000;
+    width: 26px;
+    height: 18px;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+  .crit-score-row {
+    margin-top: 4px;
+    font-weight: 600;
+    font-size: 10pt;
+    border-top: 1px solid #ddd;
+    padding-top: 3px;
+  }
+  .red-flag {
+    font-size: 8.5pt;
+    color: #b71c1c;
+    margin-top: 3px;
+    background: #ffe8e8;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* PAGE 2 */
+  .pagebreak { page-break-before: always; }
+  h2.section {
+    font-size: 12pt;
+    font-weight: 700;
+    margin: 10px 0 6px;
+    padding-bottom: 3px;
+    border-bottom: 1.5px solid #000;
+  }
+  table.summary {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+    margin-bottom: 10px;
+  }
+  table.summary th, table.summary td {
+    border: 1px solid #888;
+    padding: 5px 8px;
+    text-align: center;
+  }
+  table.summary th { background: #1a1a4e; color: white; font-weight: 600; font-size: 9.5pt; }
+  table.summary td.left { text-align: left; font-weight: 500; }
+  table.summary tr.total td { font-weight: 700; background: #f0e7f7; font-size: 11pt; }
+
+  .notes {
+    border: 1px solid #888;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    min-height: 80px;
+  }
+  .notes h3 { font-size: 10.5pt; font-weight: 700; margin-bottom: 4px; }
+  .notes-line {
+    border-bottom: 1px solid #ccc;
+    height: 18px;
+    margin-bottom: 3px;
+  }
+
+  .recommend {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    padding: 8px;
+    border: 1.2px solid #000;
+    border-radius: 4px;
+    font-size: 10.5pt;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .recommend label { display: inline-flex; align-items: center; gap: 5px; }
+
+  .signature-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 10pt;
+  }
+  .signature-row .sig {
+    width: 45%;
+    border-bottom: 1px solid #000;
+    text-align: center;
+    padding-bottom: 3px;
+  }
+  .signature-row .sig-label { font-size: 9pt; color: #555; margin-top: 3px; text-align: center; }
+
+  /* tighter no-break */
+  .keep { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<div class="print-banner">
+  💡 พิมพ์เป็น PDF: กด <kbd>⌘ Cmd + P</kbd> (Mac) หรือ <kbd>Ctrl + P</kbd> (Windows) แล้วเลือก "Save as PDF"
+  <button onclick="window.print()">🖨️ พิมพ์เลย</button>
+</div>
+
+<!-- ========== PAGE 1 — คำถามและเกณฑ์ ========== -->
+
+<div class="doc-title">แบบประเมินสัมภาษณ์ — DIP × AOO 2569</div>
+<div class="doc-sub">การคัดเลือกผู้ประกอบการ 30 → 15 กิจการ · Zoom 15 นาที</div>
+
+<div class="info-bar">
+  <div><span class="label">ชื่อกิจการ:</span><span class="blank">&nbsp;</span></div>
+  <div><span class="label">ลำดับคิว: บ.#</span><span class="blank" style="min-width:60px;">&nbsp;</span></div>
+  <div><span class="label">ผู้ตอบ:</span><span class="blank">&nbsp;</span></div>
+  <div><span class="label">ตำแหน่ง:</span><span class="blank">&nbsp;</span></div>
+  <div><span class="label">วันที่:</span><span class="blank" style="min-width:80px;">&nbsp;</span> <span class="label">เวลา:</span><span class="blank" style="min-width:55px;">&nbsp;</span></div>
+  <div><span class="label">ผู้สัมภาษณ์:</span><span class="blank">&nbsp;</span></div>
+</div>
+
+<!-- ข้อ 1 — ข้อกำหนดความพร้อม -->
+<div class="gate keep">
+  <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+    <div class="gate-title" style="margin:0;">🛑 1. ข้อกำหนดความพร้อม</div>
+    <span class="crit-weight" style="background:#ffe0e0; color:#b71c1c;">น้ำหนัก 30%</span>
+  </div>
+  <div style="font-size:9pt; color:#666; margin-bottom:4px;">ต้องเข้าได้ครบทุกข้อ — ถ้าข้อใดข้อหนึ่งไม่ได้ จะไม่ผ่านการคัดเลือก</div>
+  <ol>
+    <li><strong>พิธีเปิดโครงการ 11 มิ.ย. 09:00 ผ่าน Zoom (2 ชม.)</strong> เข้าได้มั้ย? &nbsp; <span class="check"></span> ใช่ &nbsp; <span class="check"></span> ไม่ใช่</li>
+    <li><strong>1st Visit — ผู้เชี่ยวชาญเข้าเยี่ยมกิจการ 1 วันเต็ม</strong> ระหว่าง 12–22 มิ.ย. (เลือก 1 วันที่สะดวก) — รับได้มั้ย? &nbsp; <span class="check"></span> ใช่ &nbsp; <span class="check"></span> ไม่ใช่</li>
+    <li style="background:#fff3e0; padding:5px 7px; border-radius:3px; margin:3px 0; list-style-position:inside;"><strong>Group Sessions 4 ครั้ง (on-site, ~6 ชม./ครั้ง) — ต้องเลือก 1 กลุ่ม เข้าครบทุกครั้ง:</strong>
+      <div style="margin:4px 0 4px 16px; font-size:9.5pt;">
+        <span class="check"></span> <strong>กลุ่ม 1 (ทุกวันพุธ):</strong> 24 มิ.ย. · 1 ก.ค. · 8 ก.ค. · 15 ก.ค.<br>
+        <span class="check"></span> <strong>กลุ่ม 2 (ทุกวันจันทร์):</strong> 6 ก.ค. · 13 ก.ค. · 20 ก.ค. · 27 ก.ค.
+      </div>
+      เข้าครบกลุ่มที่เลือกได้มั้ย? &nbsp; <span class="check"></span> ใช่ &nbsp; <span class="check"></span> ไม่ใช่
+    </li>
+    <li><strong>ลงทะเบียน i-industry ในระบบของ DIP ภายใน 23 มิ.ย.</strong> ทำได้มั้ย? &nbsp; <span class="check"></span> ใช่ &nbsp; <span class="check"></span> ไม่ใช่</li>
+  </ol>
+  <div class="gate-result">
+    ►► ผ่านครบทุกข้อ? &nbsp; <span class="check"></span> ใช่ (= 5/5 · ประเมินต่อข้อ 2–7) &nbsp;&nbsp; <span class="check"></span> ไม่ใช่ (= 0 · ไม่ผ่านการคัดเลือก)
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="crit keep">
+  <div class="crit-head"><span class="crit-title">2. ความจำเป็นของเว็บไซต์/AI</span><span class="crit-weight">น้ำหนัก 20%</span></div>
+  <div class="crit-q">❓ "เว็บไซต์/AI ที่อยากได้ จะเอาไปแก้ปัญหาอะไรของธุรกิจตอนนี้?"</div>
+  <div class="rubric">
+    <span class="r"><span class="r-num">5</span>ระบุปัญหาชัด + แผนแก้เป็นขั้นตอน + <strong>มีตัวเลข</strong></span>
+    <span class="r"><span class="r-num">4</span>ระบุปัญหาชัด แต่ไม่มีตัวเลข</span>
+    <span class="r"><span class="r-num">3</span>รู้ว่าต้องมีเว็บ บอกได้แค่กว้างๆ</span>
+    <span class="r"><span class="r-num">2</span>ตอบไม่ตรง / ลังเล</span>
+    <span class="r"><span class="r-num">1</span>ไม่รู้จะเอาไปทำอะไร</span>
+  </div>
+  <div class="crit-score-row">คะแนน: <span class="score-box"></span> / 5 &nbsp;&nbsp; <span class="red-flag">🚩 "อยากได้เพราะฟรี" / "เพื่อนแนะนำ" / "ใครๆ ก็มี"</span></div>
+</div>
+
+<!-- Q3 -->
+<div class="crit keep">
+  <div class="crit-head"><span class="crit-title">3. สินค้า/บริการชัดเจน แข่งขันได้</span><span class="crit-weight">น้ำหนัก 15%</span></div>
+  <div class="crit-q">❓ "เล่าสินค้า/บริการ ลูกค้าหลักคือใคร ต่างจากคู่แข่งยังไง?"</div>
+  <div class="rubric">
+    <span class="r"><span class="r-num">5</span>ครบ — product + target + USP + ราคา + positioning</span>
+    <span class="r"><span class="r-num">4</span>สินค้า + target ชัด แต่ USP กว้าง</span>
+    <span class="r"><span class="r-num">3</span>บอกสินค้าได้ แต่ target / USP ไม่ชัด</span>
+    <span class="r"><span class="r-num">2</span>ขายหลายอย่างเกินไป / กำลังจะเริ่ม</span>
+    <span class="r"><span class="r-num">1</span>ยังไม่ได้เริ่ม</span>
+  </div>
+  <div class="crit-score-row">คะแนน: <span class="score-box"></span> / 5 &nbsp;&nbsp; <span class="red-flag">🚩 "ลูกค้าคือทุกคน" / "ขายอะไรก็ได้" / "ยังไม่ได้เปิดร้าน"</span></div>
+</div>
+
+<!-- Q4 -->
+<div class="crit keep">
+  <div class="crit-head"><span class="crit-title">4. ประสบการณ์ตลาดออนไลน์</span><span class="crit-weight">น้ำหนัก 12%</span></div>
+  <div class="crit-q">❓ "เคยทำ FB Ads / LINE OA / Shopee / TikTok มั้ย? ผลเป็นยังไง?"</div>
+  <div class="rubric">
+    <span class="r"><span class="r-num">5</span>หลายช่องทาง + <strong>มีตัวเลข</strong> (CPL / ROAS) + วิเคราะห์ได้</span>
+    <span class="r"><span class="r-num">4</span>ต่อเนื่อง + บอกผลคร่าวๆ</span>
+    <span class="r"><span class="r-num">3</span>เคยทำเล็กน้อย ไม่มีระบบ</span>
+    <span class="r"><span class="r-num">2</span>เคยลอง ไม่เข้าใจผล</span>
+    <span class="r"><span class="r-num">1</span>ไม่เคยทำเลย</span>
+  </div>
+  <div class="crit-score-row">คะแนน: <span class="score-box"></span> / 5 &nbsp;&nbsp; <span class="red-flag">🚩 "เสียเงินไปเยอะ ไม่รู้ผล" / "ลูกหลานทำให้ ผมไม่รู้รายละเอียด"</span></div>
+</div>
+
+<!-- Q5 -->
+<div class="crit keep">
+  <div class="crit-head"><span class="crit-title">5. ความตั้งใจในการเข้าร่วม</span><span class="crit-weight">น้ำหนัก 10%</span></div>
+  <div class="crit-q">❓ "30 ชม. 5 ครั้ง เป็นเรื่องใหญ่ — คุณเตรียมเวลายังไง? ใครมาแทนถ้าติดธุระ?"</div>
+  <div class="rubric">
+    <span class="r"><span class="r-num">5</span>เตรียมตัว + บอกแผนชัด + มีแผนสำรอง + กระตือรือร้น</span>
+    <span class="r"><span class="r-num">4</span>เข้าใจว่าต้องทุ่ม แต่ไม่มีแผนสำรอง</span>
+    <span class="r"><span class="r-num">3</span>รับว่าเข้าได้ ไม่บอกแผน</span>
+    <span class="r"><span class="r-num">2</span>ลังเล "ลองดู"</span>
+    <span class="r"><span class="r-num">1</span>น่าจะติดธุระ / ขอเลื่อน</span>
+  </div>
+  <div class="crit-score-row">คะแนน: <span class="score-box"></span> / 5 &nbsp;&nbsp; <span class="red-flag">🚩 "ส่งพนักงาน/ลูกชายมาแทน" (ผู้บริหารไม่เข้าเอง = ผิดเงื่อนไข)</span></div>
+</div>
+
+<!-- Q6 -->
+<div class="crit keep">
+  <div class="crit-head"><span class="crit-title">6. ความพร้อมของช่องทางเดิม</span><span class="crit-weight">น้ำหนัก 8%</span></div>
+  <div class="crit-q">❓ "ตอนนี้มี FB Page / LINE OA / รูปสินค้า / content อะไรพร้อมใช้บ้าง?"</div>
+  <div class="rubric">
+    <span class="r"><span class="r-num">5</span>ครบ — FB + LINE OA + รูปดี + content ต่อเนื่อง</span>
+    <span class="r"><span class="r-num">4</span>มี FB + LINE OA + รูปพอใช้</span>
+    <span class="r"><span class="r-num">3</span>มี FB หรือ LINE OA + รูปบ้าง</span>
+    <span class="r"><span class="r-num">2</span>มี FB แต่ไม่ active</span>
+    <span class="r"><span class="r-num">1</span>ไม่มีช่องทางออนไลน์</span>
+  </div>
+  <div class="crit-score-row">คะแนน: <span class="score-box"></span> / 5 &nbsp;&nbsp; <span class="red-flag">🚩 "ใช้รูปจาก Google" / "FB ไม่ได้โพสมาปีนึง"</span></div>
+</div>
+
+<!-- Q7 -->
+<div class="crit keep">
+  <div class="crit-head"><span class="crit-title">7. ทักษะ digital + พร้อมเรียนรู้ AI</span><span class="crit-weight">น้ำหนัก 5%</span></div>
+  <div class="crit-q">❓ "ทีมงานใช้เครื่องมือดิจิทัลอะไร? เคยใช้ ChatGPT/AI tool มั้ย?"</div>
+  <div class="rubric">
+    <span class="r"><span class="r-num">5</span>ใช้ Google Workspace / Notion / Canva + ลอง AI</span>
+    <span class="r"><span class="r-num">4</span>ใช้ MS Office + Line + อยากเรียน AI</span>
+    <span class="r"><span class="r-num">3</span>ใช้พื้นฐาน + รู้จัก AI</span>
+    <span class="r"><span class="r-num">2</span>ใช้แต่ Line + ไม่เคยลอง AI</span>
+    <span class="r"><span class="r-num">1</span>ไม่ค่อยใช้คอม</span>
+  </div>
+  <div class="crit-score-row">คะแนน: <span class="score-box"></span> / 5 &nbsp;&nbsp; <span class="red-flag">🚩 "ให้ลูกหลานทำให้หมดเลย"</span></div>
+</div>
+
+<!-- ========== PAGE 2 — สรุปคะแนน ========== -->
+<div class="pagebreak"></div>
+
+<div class="doc-title">สรุปคะแนนและความเห็น</div>
+<div class="doc-sub" style="margin-bottom:14px;">ชื่อกิจการ: ______________________________________ &nbsp;&nbsp; ผู้สัมภาษณ์: ______________________</div>
+
+<h2 class="section">📊 ตารางสรุปคะแนน</h2>
+
+<table class="summary">
+  <thead>
+    <tr>
+      <th style="width:8%;">ข้อ</th>
+      <th style="width:42%;">หัวข้อ</th>
+      <th style="width:15%;">คะแนน (1–5)</th>
+      <th style="width:12%;">น้ำหนัก</th>
+      <th style="width:23%;">คะแนน × น้ำหนัก</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td class="left">🛑 ข้อกำหนดความพร้อม (ผ่าน=5 · ไม่ผ่าน=0)</td><td>____ / 5</td><td>30</td><td>____ / 150</td></tr>
+    <tr><td>2</td><td class="left">ความจำเป็นของเว็บ/AI</td><td>____ / 5</td><td>20</td><td>____ / 100</td></tr>
+    <tr><td>3</td><td class="left">สินค้า/บริการชัด</td><td>____ / 5</td><td>15</td><td>____ / 75</td></tr>
+    <tr><td>4</td><td class="left">ประสบการณ์ตลาดออนไลน์</td><td>____ / 5</td><td>12</td><td>____ / 60</td></tr>
+    <tr><td>5</td><td class="left">ความตั้งใจ</td><td>____ / 5</td><td>10</td><td>____ / 50</td></tr>
+    <tr><td>6</td><td class="left">ช่องทางเดิม</td><td>____ / 5</td><td>8</td><td>____ / 40</td></tr>
+    <tr><td>7</td><td class="left">ทักษะ digital</td><td>____ / 5</td><td>5</td><td>____ / 25</td></tr>
+    <tr class="total"><td colspan="4">รวม (÷ 5)</td><td>____ / 100</td></tr>
+  </tbody>
+</table>
+
+<h2 class="section">📝 ข้อสังเกตเพิ่มเติม (จุดเด่น / จุดอ่อน / Quote เด่น)</h2>
+<div class="notes">
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+  <div class="notes-line"></div>
+</div>
+
+<h2 class="section">✅ ความเห็นกรรมการ</h2>
+<div class="recommend">
+  <label><span class="check"></span> รับเข้าโครงการ (ผ่านความพร้อม + คะแนนดี)</label>
+  <label><span class="check"></span> สำรอง (ผ่านความพร้อม · คะแนนกลาง)</label>
+  <label><span class="check"></span> ไม่รับ (ไม่ผ่านความพร้อม หรือคะแนนต่ำ)</label>
+</div>
+
+<div class="signature-row">
+  <div>
+    <div class="sig">&nbsp;</div>
+    <div class="sig-label">ลายเซ็นกรรมการ</div>
+  </div>
+  <div>
+    <div class="sig">&nbsp;</div>
+    <div class="sig-label">วันที่</div>
+  </div>
+</div>
+
+</body>
+</html>
